@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model arriendos {
+  id                    Int              @id @default(autoincrement())
+  cliente_id            Int
+  vehiculo_id           Int
+  usuario_id            Int
+  fecha_inicio          DateTime         @db.Date
+  fecha_termino         DateTime         @db.Date
+  fecha_hora_entrega    DateTime         @db.DateTime(0)
+  fecha_hora_recepcion  DateTime?        @db.DateTime(0)
+  valor_diario_aplicado Int              @db.UnsignedInt
+  dias_arriendo         Int              @db.UnsignedInt
+  valor_total           Int              @db.UnsignedInt
+  estado                arriendos_estado @default(vigente)
+  fotos_entrega         String           @db.LongText
+  fotos_recepcion       String?          @db.LongText
+  vehiculo_activo_id    Int?             @unique(map: "uk_arriendos_vehiculo_vigente")
+  created_at            DateTime         @default(now()) @db.DateTime(0)
+  updated_at            DateTime         @default(now()) @db.DateTime(0)
+  clientes              clientes         @relation(fields: [cliente_id], references: [id], map: "fk_arriendos_clientes")
+  usuarios              usuarios         @relation(fields: [usuario_id], references: [id], map: "fk_arriendos_usuarios")
+  vehiculos             vehiculos        @relation(fields: [vehiculo_id], references: [id], map: "fk_arriendos_vehiculos")
+
+  @@index([cliente_id], map: "idx_arriendos_cliente")
+  @@index([estado], map: "idx_arriendos_estado")
+  @@index([usuario_id], map: "idx_arriendos_usuario")
+  @@index([vehiculo_id], map: "idx_arriendos_vehiculo")
+}
+
+model clientes {
+  id                Int         @id @default(autoincrement())
+  rut               String      @unique(map: "rut") @db.VarChar(12)
+  nombres           String      @db.VarChar(100)
+  apellidos         String      @db.VarChar(100)
+  email             String      @unique(map: "email") @db.VarChar(150)
+  telefono          String      @db.VarChar(20)
+  direccion         String      @db.VarChar(200)
+  licencia_conducir String      @db.VarChar(30)
+  activo            Boolean     @default(true)
+  created_at        DateTime    @default(now()) @db.DateTime(0)
+  updated_at        DateTime    @default(now()) @db.DateTime(0)
+  arriendos         arriendos[]
+}
+
+model perfiles {
+  id         Int        @id @default(autoincrement())
+  nombre     String     @unique(map: "nombre") @db.VarChar(50)
+  created_at DateTime   @default(now()) @db.DateTime(0)
+  updated_at DateTime   @default(now()) @db.DateTime(0)
+  usuarios   usuarios[]
+}
+
+model tipos_vehiculo {
+  id           Int         @id @default(autoincrement())
+  nombre       String      @unique(map: "nombre") @db.VarChar(80)
+  descripcion  String      @db.VarChar(255)
+  valor_diario Int         @db.UnsignedInt
+  activo       Boolean     @default(true)
+  created_at   DateTime    @default(now()) @db.DateTime(0)
+  updated_at   DateTime    @default(now()) @db.DateTime(0)
+  vehiculos    vehiculos[]
+}
+
+model usuarios {
+  id            Int         @id @default(autoincrement())
+  perfil_id     Int
+  rut           String      @unique(map: "rut") @db.VarChar(12)
+  nombres       String      @db.VarChar(100)
+  apellidos     String      @db.VarChar(100)
+  email         String      @unique(map: "email") @db.VarChar(150)
+  password_hash String      @db.VarChar(255)
+  activo        Boolean     @default(true)
+  created_at    DateTime    @default(now()) @db.DateTime(0)
+  updated_at    DateTime    @default(now()) @db.DateTime(0)
+  arriendos     arriendos[]
+  perfiles      perfiles    @relation(fields: [perfil_id], references: [id], map: "fk_usuarios_perfiles")
+
+  @@index([perfil_id], map: "fk_usuarios_perfiles")
+}
+
+model vehiculos {
+  id             Int              @id @default(autoincrement())
+  tipo_id        Int
+  patente        String           @unique(map: "patente") @db.VarChar(10)
+  marca          String           @db.VarChar(80)
+  modelo         String           @db.VarChar(80)
+  anio           Int              @db.UnsignedSmallInt
+  color          String           @db.VarChar(50)
+  estado         vehiculos_estado @default(disponible)
+  foto_url       String           @db.VarChar(255)
+  activo         Boolean          @default(true)
+  created_at     DateTime         @default(now()) @db.DateTime(0)
+  updated_at     DateTime         @default(now()) @db.DateTime(0)
+  arriendos      arriendos[]
+  tipos_vehiculo tipos_vehiculo   @relation(fields: [tipo_id], references: [id], map: "fk_vehiculos_tipos")
+
+  @@index([tipo_id], map: "fk_vehiculos_tipos")
+}
+
+enum vehiculos_estado {
+  disponible
+  arrendado
+  en_mantenimiento
+  de_baja
+}
+
+enum arriendos_estado {
+  vigente
+  finalizado
+}
