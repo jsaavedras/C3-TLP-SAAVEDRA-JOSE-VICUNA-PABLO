@@ -1,64 +1,204 @@
 <template>
-  <div class="p-8 max-w-6xl mx-auto space-y-6">
-    <div class="flex justify-between items-center">
-      <h1 class="text-2xl font-bold text-gray-900">Gestión de Usuarios</h1>
-      <UButton color="primary" icon="i-heroicons-user-plus" @click="abrirParaCrear" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium flex items-center transition-colors">Nuevo Usuario</UButton>
+  <!-- Página usuarios -->
+  <section class="usuarios-page">
+
+    <!-- Encabezado -->
+    <header class="usuarios-header">
+      <div>
+        <h1 class="usuarios-title">
+          Usuarios
+        </h1>
+
+        <p class="usuarios-description">
+          Administra las cuentas de acceso al sistema, sus perfiles, estado y datos principales.
+        </p>
+      </div>
+
+      <div class="usuarios-header-actions">
+        <button type="button" class="usuarios-primary-button" @click="abrirModalCrear">
+          Nuevo usuario
+        </button>
+      </div>
+    </header>
+
+    <!-- Resumen -->
+    <section class="usuarios-summary-grid">
+
+      <article class="usuarios-summary-card">
+        <span class="usuarios-summary-label">
+          Usuarios activos
+        </span>
+
+        <strong class="usuarios-summary-value">
+          {{ resumen.activos }}
+        </strong>
+
+        <p class="usuarios-summary-text">
+          Cuentas habilitadas para ingresar
+        </p>
+      </article>
+
+      <article class="usuarios-summary-card">
+        <span class="usuarios-summary-label">
+          Usuarios inactivos
+        </span>
+
+        <strong class="usuarios-summary-value">
+          {{ resumen.inactivos }}
+        </strong>
+
+        <p class="usuarios-summary-text">
+          Cuentas desactivadas del sistema
+        </p>
+      </article>
+
+      <article class="usuarios-summary-card">
+        <span class="usuarios-summary-label">
+          Administradores
+        </span>
+
+        <strong class="usuarios-summary-value">
+          {{ resumen.administradores }}
+        </strong>
+
+        <p class="usuarios-summary-text">
+          Usuarios con permisos completos
+        </p>
+      </article>
+
+      <article class="usuarios-summary-card">
+        <span class="usuarios-summary-label">
+          Ejecutivos
+        </span>
+
+        <strong class="usuarios-summary-value">
+          {{ resumen.ejecutivos }}
+        </strong>
+
+        <p class="usuarios-summary-text">
+          Usuarios operativos del sistema
+        </p>
+      </article>
+
+    </section>
+
+    <!-- Filtros -->
+    <section class="usuarios-filters-card">
+
+      <div class="usuarios-filters-grid">
+
+        <div class="usuarios-field">
+          <label class="usuarios-label">
+            Buscar usuario
+          </label>
+
+          <input v-model="busqueda" type="text" class="usuarios-input" placeholder="Buscar por RUT, nombre, apellido o correo">
+        </div>
+
+        <div class="usuarios-field">
+          <label class="usuarios-label">
+            Perfil
+          </label>
+
+          <select v-model="filtroPerfil" class="usuarios-select">
+            <option value="">
+              Todos los perfiles
+            </option>
+
+            <option value="administrador">
+              Administrador
+            </option>
+
+            <option value="ejecutivo">
+              Ejecutivo
+            </option>
+          </select>
+        </div>
+
+        <div class="usuarios-field">
+          <label class="usuarios-label">
+            Estado
+          </label>
+
+          <select v-model="filtroEstado" class="usuarios-select">
+            <option value="">
+              Todos los estados
+            </option>
+
+            <option value="activo">
+              Activo
+            </option>
+
+            <option value="inactivo">
+              Inactivo
+            </option>
+          </select>
+        </div>
+
+      </div>
+
+    </section>
+
+    <div v-if="mensajeError" class="mb-4 rounded-lg bg-red-50 p-4 text-sm font-bold text-red-800">
+      {{ mensajeError }}
     </div>
- 
-    <UCard>
-      <div v-if="cargando" class="text-center py-12 text-gray-400">Cargando usuarios...</div>
- 
-      <div v-else class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 text-left text-sm">
-          <thead class="bg-gray-800 font-semibold text-gray-300 text-xs uppercase tracking-wider">
+
+    <div v-if="mensajeExito" class="mb-4 rounded-lg bg-green-50 p-4 text-sm font-bold text-green-800">
+      {{ mensajeExito }}
+    </div>
+
+    <section v-if="cargando" class="rounded-lg bg-white p-6 text-center text-sm font-bold text-slate-600">
+      Cargando usuarios...
+    </section>
+
+    <section v-else-if="usuariosFiltrados.length > 0" class="rounded-lg border border-slate-200 bg-white shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+          <thead class="bg-slate-50">
             <tr>
-              <th class="p-4">RUT</th>
-              <th class="p-4">Nombre Completo</th>
-              <th class="p-4">Email</th>
-              <th class="p-4">Rol / Perfil</th>
-              <th class="p-4">Estado</th>
-              <th class="p-4 text-right">Acciones</th>
+              <th class="px-4 py-3 text-left font-bold text-slate-600">Usuario</th>
+              <th class="px-4 py-3 text-left font-bold text-slate-600">RUT</th>
+              <th class="px-4 py-3 text-left font-bold text-slate-600">Correo</th>
+              <th class="px-4 py-3 text-left font-bold text-slate-600">Perfil</th>
+              <th class="px-4 py-3 text-left font-bold text-slate-600">Estado</th>
+              <th class="px-4 py-3 text-left font-bold text-slate-600">Creado</th>
+              <th class="px-4 py-3 text-right font-bold text-slate-600">Acciones</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-800">
-            <tr v-for="usr in listaUsuarios" :key="usr.id">
-              <td class="p-4 font-mono">{{ usr.rut }}</td>
-              <td class="p-4 font-medium text-gray-300">{{ usr.nombres }} {{ usr.apellidos }}</td>
-              <td class="p-4 text-gray-300">{{ usr.email }}</td>
-              <td class="p-4">
-                <span class="px-2 py-0.5 text-xs font-semibold rounded bg-blue-100 text-blue-800 uppercase">
-                  {{ usr.perfiles?.nombre }}
-                </span>
+
+          <tbody class="divide-y divide-slate-100">
+            <tr v-for="usuario in usuariosFiltrados" :key="usuario.id">
+              <td class="px-4 py-3 font-bold text-slate-900">
+                {{ usuario.nombres }} {{ usuario.apellidos }}
               </td>
-              <td class="p-4">
-                <span
-                  class="px-2 py-0.5 text-xs font-semibold rounded"
-                  :class="usr.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-                >
-                  {{ usr.activo ? 'Activo' : 'Inactivo' }}
-                </span>
+              <td class="px-4 py-3 text-slate-700">
+                {{ usuario.rut }}
               </td>
-              <td class="p-4 text-right">
-                <div class="flex justify-end gap-3">
-                  <button class="text-blue-600 hover:text-blue-800 font-medium text-sm" @click="abrirParaEditar(usr)">
+              <td class="px-4 py-3 text-slate-700">
+                {{ usuario.email }}
+              </td>
+              <td class="px-4 py-3">
+                <BaseStatusBadge :tipo="usuario.perfiles?.nombre || 'ejecutivo'" />
+              </td>
+              <td class="px-4 py-3">
+                <BaseStatusBadge :tipo="usuario.activo ? 'activo' : 'inactivo'" />
+              </td>
+              <td class="px-4 py-3 text-slate-700">
+                {{ formatDate(usuario.created_at) }}
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex justify-end gap-2">
+                  <button type="button" class="usuarios-secondary-button" @click="abrirModalEditar(usuario)">
                     Editar
                   </button>
+
                   <button
-                    class="font-medium text-sm"
-                    :class="[usr.activo ? 'text-red-600 hover:text-red-800' : 'text-green-600 hover:text-green-800', user?.id === usr.id ? 'opacity-30 cursor-not-allowed' : '']"
-                    :disabled="user?.id === usr.id"
-                    @click="cambiarEstadoUsuario(usr)"
+                    v-if="puedeDesactivar(usuario)"
+                    type="button"
+                    class="usuarios-danger-button"
+                    @click="pedirDesactivar(usuario)"
                   >
-                    {{ usr.activo ? 'Desactivar' : 'Activar' }}
-                  </button>
-                  <button
-                    class="font-medium text-sm text-red-700 hover:text-red-900"
-                    :class="{ 'opacity-30 cursor-not-allowed': user?.id === usr.id }"
-                    :disabled="user?.id === usr.id"
-                    :title="user?.id === usr.id ? 'No puedes eliminar tu propia cuenta' : 'Eliminar usuario permanentemente'"
-                    @click="solicitarEliminacion(usr)"
-                  >
-                    Eliminar
+                    Desactivar
                   </button>
                 </div>
               </td>
@@ -66,239 +206,618 @@
           </tbody>
         </table>
       </div>
-    </UCard>
- 
-    <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden">
-        <div class="flex justify-between items-center p-6 border-b border-gray-200">
-          <h3 class="text-xl font-bold text-gray-800">{{ editandoId ? 'Editar Usuario' : 'Nuevo Usuario' }}</h3>
-          <button type="button" @click="cerrarModal" class="text-gray-400 hover:text-red-500 text-2xl font-bold leading-none">×</button>
-        </div>
- 
-        <form @submit.prevent="guardarUsuario" class="p-6 space-y-4 text-black">
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">RUT *</label>
-              <input v-model="formulario.rut" type="text" class="w-full border border-gray-300 rounded-md px-3 py-2" required />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Perfil *</label>
-              <select
-                v-model="formulario.perfil_id"
-                class="w-full border border-gray-300 rounded-md px-3 py-2 bg-white disabled:bg-gray-100 disabled:text-gray-400"
-                :disabled="editandoEsCuentaPropia"
-                required
-              >
-                <option value="" disabled>-- Seleccione --</option>
-                <option value="1">Administrador</option>
-                <option value="2">Ejecutivo</option>
-              </select>
-              <p v-if="editandoEsCuentaPropia" class="text-xs text-gray-500 mt-1">
-                No puedes cambiar el rol de tu propia cuenta.
-              </p>
-            </div>
-          </div>
- 
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Nombres *</label>
-              <input v-model="formulario.nombres" type="text" class="w-full border border-gray-300 rounded-md px-3 py-2" required />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Apellidos *</label>
-              <input v-model="formulario.apellidos" type="text" class="w-full border border-gray-300 rounded-md px-3 py-2" required />
-            </div>
-          </div>
- 
+    </section>
+
+    <BaseEmptyState
+      v-else
+      titulo="No hay usuarios para mostrar"
+      mensaje="Cuando registres usuarios, apareceran en esta seccion."
+      accion-texto="Nuevo usuario"
+      @accion="abrirModalCrear"
+    />
+
+    <section v-if="modalAbierto" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4">
+      <div class="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-6 shadow-xl">
+        <header class="mb-5 flex items-start justify-between gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico *</label>
-            <input v-model="formulario.email" type="email" class="w-full border border-gray-300 rounded-md px-3 py-2" required />
+            <h2 class="text-xl font-bold text-slate-900">
+              {{ modoFormulario === 'crear' ? 'Nuevo usuario' : 'Editar usuario' }}
+            </h2>
+            <p class="text-sm text-slate-600">
+              Asigna datos de acceso y perfil del sistema.
+            </p>
           </div>
- 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              {{ editandoId ? 'Nueva Contraseña (dejar en blanco para no cambiar)' : 'Contraseña *' }}
-            </label>
-            <input v-model="formulario.password" type="password" minlength="6" class="w-full border border-gray-300 rounded-md px-3 py-2" :required="!editandoId" />
-          </div>
- 
-          <UAlert v-if="errorMsg" color="red" variant="soft" :title="errorMsg" />
- 
-          <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
-            <button type="button" @click="cerrarModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md font-medium">Cancelar</button>
-            <button type="submit" :disabled="guardando" class="px-4 py-2 bg-blue-600 text-white rounded-md font-medium disabled:opacity-50">
-              {{ guardando ? 'Guardando...' : 'Guardar' }}
-            </button>
-          </div>
-        </form>
+
+          <button type="button" class="text-2xl font-bold text-slate-500 hover:text-slate-900" @click="cerrarModal">
+            x
+          </button>
+        </header>
+
+        <UsuarioForm
+          :usuario="elementoSeleccionado"
+          :perfiles="perfiles"
+          :modo="modoFormulario"
+          :guardando="guardando"
+          @guardar="guardarUsuario"
+          @cancelar="cerrarModal"
+        />
+
+        <p v-if="elementoSeleccionado && esUsuarioActual(elementoSeleccionado)" class="mt-3 rounded-lg bg-yellow-50 p-3 text-sm font-bold text-yellow-800">
+          Tu propia cuenta no puede cambiar perfil ni estado desde esta pantalla.
+        </p>
       </div>
-    </div>
- 
-    <div v-if="mostrarConfirmacion" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 transition-opacity">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
-        <div class="p-6">
-          <h3 class="text-lg font-bold text-gray-900 mb-2">Confirmar eliminación</h3>
-          <p class="text-sm text-gray-600">
-            ¿Estás seguro de que deseas eliminar permanentemente a
-            <span class="font-semibold">{{ usuarioAEliminar?.nombres }} {{ usuarioAEliminar?.apellidos }}</span>?
-            Esta acción no se puede deshacer.
-          </p>
+    </section>
+
+    <BaseConfirmModal
+      :abierto="confirmacionAbierta"
+      titulo="Desactivar usuario"
+      :mensaje="mensajeConfirmacion"
+      texto-confirmar="Desactivar"
+      tipo="danger"
+      :cargando="guardando"
+      @cancelar="cerrarConfirmacion"
+      @confirmar="desactivarUsuario"
+    />
+
+    <!-- Tabla de usuarios -->
+    <section v-if="false" class="usuarios-table-card">
+
+      <div class="usuarios-table-wrapper">
+
+        <table class="usuarios-table">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>RUT</th>
+              <th>Correo</th>
+              <th>Perfil</th>
+              <th>Estado</th>
+              <th>Creado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <!-- Fila de ejemplo: después se repetirá con v-for -->
+            <tr>
+              <td>
+                Juan Pérez
+              </td>
+
+              <td>
+                12.345.678-9
+              </td>
+
+              <td>
+                juan@sistema.cl
+              </td>
+
+              <td>
+                <span class="usuarios-profile usuarios-profile-admin">
+                  Administrador
+                </span>
+              </td>
+
+              <td>
+                <span class="usuarios-status usuarios-status-activo">
+                  Activo
+                </span>
+              </td>
+
+              <td>
+                2026-01-01
+              </td>
+
+              <td>
+                <div class="usuarios-table-actions">
+                  <button type="button" class="usuarios-secondary-button">
+                    Editar
+                  </button>
+
+                  <button type="button" class="usuarios-danger-button">
+                    Desactivar
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+    </section>
+
+    <!-- Vista móvil -->
+    <section v-if="false" class="usuarios-mobile-list">
+
+      <!-- Card de ejemplo: después se repetirá con v-for -->
+      <article class="usuarios-mobile-card">
+
+        <header class="usuarios-mobile-card-header">
+          <div>
+            <h2 class="usuarios-mobile-card-title">
+              Juan Pérez
+            </h2>
+
+            <p class="usuarios-mobile-card-subtitle">
+              12.345.678-9 · juan@sistema.cl
+            </p>
+          </div>
+
+          <span class="usuarios-status usuarios-status-activo">
+            Activo
+          </span>
+        </header>
+
+        <div class="usuarios-mobile-info-grid">
+
+          <div class="usuarios-mobile-info-item">
+            <span class="usuarios-mobile-info-label">
+              Perfil
+            </span>
+
+            <strong class="usuarios-mobile-info-value">
+              Administrador
+            </strong>
+          </div>
+
+          <div class="usuarios-mobile-info-item">
+            <span class="usuarios-mobile-info-label">
+              Fecha creación
+            </span>
+
+            <strong class="usuarios-mobile-info-value">
+              2026-01-01
+            </strong>
+          </div>
+
         </div>
-        <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-200">
-          <button
-            type="button"
-            @click="cancelarEliminacion"
-            class="px-5 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 font-medium transition-colors"
-          >
+
+        <footer class="usuarios-mobile-actions">
+          <button type="button" class="usuarios-secondary-button">
+            Editar
+          </button>
+
+          <button type="button" class="usuarios-danger-button">
+            Desactivar
+          </button>
+        </footer>
+
+      </article>
+
+    </section>
+
+    <!-- Estado vacío -->
+    <section v-if="false" class="usuarios-empty" hidden>
+      <h2 class="usuarios-empty-title">
+        No hay usuarios para mostrar
+      </h2>
+
+      <p class="usuarios-empty-text">
+        Cuando registres usuarios, aparecerán en esta sección.
+      </p>
+    </section>
+
+    <!-- Modal crear / editar usuario -->
+    <section v-if="false" class="usuarios-modal-backdrop" hidden>
+      <div class="usuarios-modal">
+
+        <header class="usuarios-modal-header">
+          <h2 class="usuarios-modal-title">
+            Nuevo usuario
+          </h2>
+
+          <button type="button" class="usuarios-modal-close">
+            ×
+          </button>
+        </header>
+
+        <form class="usuarios-form">
+
+          <div class="usuarios-field">
+            <label class="usuarios-label">
+              Perfil
+            </label>
+
+            <select class="usuarios-select">
+              <option value="">
+                Selecciona un perfil
+              </option>
+
+              <option value="1">
+                Administrador
+              </option>
+
+              <option value="2">
+                Ejecutivo
+              </option>
+            </select>
+          </div>
+
+          <div class="usuarios-field">
+            <label class="usuarios-label">
+              RUT
+            </label>
+
+            <input type="text" class="usuarios-input" placeholder="Ej: 12.345.678-9">
+          </div>
+
+          <div class="usuarios-field">
+            <label class="usuarios-label">
+              Nombres
+            </label>
+
+            <input type="text" class="usuarios-input" placeholder="Ej: Juan">
+          </div>
+
+          <div class="usuarios-field">
+            <label class="usuarios-label">
+              Apellidos
+            </label>
+
+            <input type="text" class="usuarios-input" placeholder="Ej: Pérez">
+          </div>
+
+          <div class="usuarios-field usuarios-field-full">
+            <label class="usuarios-label">
+              Correo electrónico
+            </label>
+
+            <input type="email" class="usuarios-input" placeholder="Ej: usuario@sistema.cl">
+          </div>
+
+          <div class="usuarios-field">
+            <label class="usuarios-label">
+              Contraseña
+            </label>
+
+            <input type="password" class="usuarios-input" placeholder="Mínimo 8 caracteres">
+
+            <p class="usuarios-help">
+              Al crear usuario, la contraseña es obligatoria. Al editar, puede quedar vacía si no se desea cambiar.
+            </p>
+          </div>
+
+          <div class="usuarios-field">
+            <label class="usuarios-label">
+              Estado
+            </label>
+
+            <select class="usuarios-select">
+              <option value="true">
+                Activo
+              </option>
+
+              <option value="false">
+                Inactivo
+              </option>
+            </select>
+          </div>
+
+        </form>
+
+        <footer class="usuarios-modal-actions">
+          <button type="button" class="usuarios-secondary-button">
             Cancelar
           </button>
-          <button
-            type="button"
-            @click="confirmarEliminacion"
-            :disabled="eliminando"
-            class="px-5 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium disabled:opacity-50 transition-colors"
-          >
-            {{ eliminando ? 'Eliminando...' : 'Eliminar' }}
+
+          <button type="button" class="usuarios-primary-button">
+            Guardar usuario
           </button>
-        </div>
+        </footer>
+
       </div>
-    </div>
-  </div>
+    </section>
+
+    <!-- Modal confirmar desactivación -->
+    <section v-if="false" class="usuarios-confirm-backdrop" hidden>
+      <div class="usuarios-confirm-modal">
+
+        <header class="usuarios-confirm-header">
+          <h2 class="usuarios-confirm-title">
+            Confirmar desactivación
+          </h2>
+        </header>
+
+        <div class="usuarios-confirm-body">
+          <p class="usuarios-confirm-text">
+            ¿Seguro que deseas desactivar este usuario? No se eliminará del sistema, pero no podrá iniciar sesión.
+          </p>
+
+          <p class="usuarios-confirm-warning">
+            Un administrador no debería desactivar su propia cuenta desde esta acción.
+          </p>
+        </div>
+
+        <footer class="usuarios-confirm-actions">
+          <button type="button" class="usuarios-secondary-button">
+            Cancelar
+          </button>
+
+          <button type="button" class="usuarios-danger-button">
+            Confirmar desactivación
+          </button>
+        </footer>
+
+      </div>
+    </section>
+
+  </section>
 </template>
- 
-<script setup>
-import { ref, onMounted, reactive, computed } from 'vue'
- 
-definePageMeta({ middleware: 'admin' })
- 
+
+<script setup lang="ts">
+import type { Perfil } from '~/types/perfil'
+import type { Usuario } from '~/types/usuario'
+import { formatDate } from '~/utils/formatDate'
+import { getApiErrorMessage } from '~/utils/getApiErrorMessage'
+
+type ModoFormulario = 'crear' | 'editar'
+
+interface UsuarioFormData {
+  perfil_id: number | null
+  rut: string
+  nombres: string
+  apellidos: string
+  email: string
+  password?: string
+  activo: boolean
+}
+
+interface UsuarioRespuesta {
+  usuario: Usuario
+}
+
 const { user } = useUserSession()
- 
-const listaUsuarios = ref([])
-const cargando = ref(true)
- 
-const isModalOpen = ref(false)
+
+const usuarios = ref<Usuario[]>([])
+const perfiles = ref<Perfil[]>([
+  { id: 1, nombre: 'administrador' },
+  { id: 2, nombre: 'ejecutivo' },
+])
+
+const busqueda = ref('')
+const filtroPerfil = ref('')
+const filtroEstado = ref('')
+
+const modalAbierto = ref(false)
+const confirmacionAbierta = ref(false)
+const modoFormulario = ref<ModoFormulario>('crear')
+const elementoSeleccionado = ref<Usuario | null>(null)
+const cargando = ref(false)
 const guardando = ref(false)
-const editandoId = ref(null)
-const errorMsg = ref('')
- 
-const mostrarConfirmacion = ref(false)
-const usuarioAEliminar = ref(null)
-const eliminando = ref(false)
- 
-const estadoInicial = { rut: '', nombres: '', apellidos: '', email: '', perfil_id: '', password: '' }
-const formulario = reactive({ ...estadoInicial })
- 
-const editandoEsCuentaPropia = computed(() => editandoId.value !== null && editandoId.value === user.value?.id)
- 
-async function obtenerUsuarios() {
+const mensajeError = ref('')
+const mensajeExito = ref('')
+
+const usuariosFiltrados = computed(() => {
+  const texto = busqueda.value.trim().toLowerCase()
+
+  return usuarios.value.filter((usuario) => {
+    const nombreCompleto = `${usuario.nombres} ${usuario.apellidos}`.toLowerCase()
+    const perfil = usuario.perfiles?.nombre ?? ''
+    const estado = usuario.activo ? 'activo' : 'inactivo'
+
+    const coincideTexto = !texto
+      || usuario.rut.toLowerCase().includes(texto)
+      || nombreCompleto.includes(texto)
+      || usuario.email.toLowerCase().includes(texto)
+
+    const coincidePerfil = !filtroPerfil.value || perfil === filtroPerfil.value
+    const coincideEstado = !filtroEstado.value || estado === filtroEstado.value
+
+    return coincideTexto && coincidePerfil && coincideEstado
+  })
+})
+
+const resumen = computed(() => {
+  return {
+    activos: usuarios.value.filter((usuario) => usuario.activo).length,
+    inactivos: usuarios.value.filter((usuario) => !usuario.activo).length,
+    administradores: usuarios.value.filter((usuario) => usuario.perfiles?.nombre === 'administrador').length,
+    ejecutivos: usuarios.value.filter((usuario) => usuario.perfiles?.nombre === 'ejecutivo').length,
+  }
+})
+
+const mensajeConfirmacion = computed(() => {
+  if (!elementoSeleccionado.value) {
+    return 'Seguro que deseas desactivar este usuario?'
+  }
+
+  return `Seguro que deseas desactivar a ${elementoSeleccionado.value.nombres} ${elementoSeleccionado.value.apellidos}?`
+})
+
+async function cargarUsuarios() {
   cargando.value = true
+  mensajeError.value = ''
+
   try {
-    listaUsuarios.value = await $fetch('/api/usuarios')
-  } catch (error) {
-    console.error('Error al cargar usuarios:', error)
-  } finally {
+    usuarios.value = await $fetch<Usuario[]>('/api/usuarios')
+    cargarPerfilesDesdeUsuarios()
+  }
+  catch (error) {
+    mensajeError.value = getApiErrorMessage(error, 'No se pudieron cargar los usuarios')
+  }
+  finally {
     cargando.value = false
   }
 }
- 
-function abrirParaCrear() {
-  editandoId.value = null
-  errorMsg.value = ''
-  Object.assign(formulario, estadoInicial)
-  isModalOpen.value = true
+
+function cargarPerfilesDesdeUsuarios() {
+  const perfilesPorNombre = new Map<string, Perfil>()
+
+  for (const usuario of usuarios.value) {
+    if (usuario.perfiles) {
+      perfilesPorNombre.set(usuario.perfiles.nombre, usuario.perfiles)
+    }
+  }
+
+  for (const perfil of perfiles.value) {
+    if (!perfilesPorNombre.has(perfil.nombre)) {
+      perfilesPorNombre.set(perfil.nombre, perfil)
+    }
+  }
+
+  perfiles.value = Array.from(perfilesPorNombre.values())
 }
- 
-function abrirParaEditar(usr) {
-  editandoId.value = usr.id
-  errorMsg.value = ''
-  Object.assign(formulario, {
-    rut: usr.rut,
-    nombres: usr.nombres,
-    apellidos: usr.apellidos,
-    email: usr.email,
-    perfil_id: usr.perfiles?.nombre === 'administrador' ? '1' : '2',
-    password: ''
-  })
-  isModalOpen.value = true
+
+function abrirModalCrear() {
+  limpiarMensajes()
+  modoFormulario.value = 'crear'
+  elementoSeleccionado.value = null
+  modalAbierto.value = true
 }
- 
+
+function abrirModalEditar(usuario: Usuario) {
+  limpiarMensajes()
+  modoFormulario.value = 'editar'
+  elementoSeleccionado.value = usuario
+  modalAbierto.value = true
+}
+
 function cerrarModal() {
-  isModalOpen.value = false
-  editandoId.value = null
+  modalAbierto.value = false
+  elementoSeleccionado.value = null
 }
- 
-async function guardarUsuario() {
-  if (!formulario.rut || !formulario.nombres || !formulario.apellidos || !formulario.email || !formulario.perfil_id) {
-    errorMsg.value = 'Complete todos los campos obligatorios.'
-    return
-  }
-  if (!editandoId.value && !formulario.password) {
-    errorMsg.value = 'La contraseña es obligatoria al crear un usuario.'
-    return
-  }
- 
-  if (editandoEsCuentaPropia.value) {
-    formulario.perfil_id = '1'
-  }
- 
+
+async function guardarUsuario(datos: UsuarioFormData) {
   guardando.value = true
-  errorMsg.value = ''
+  limpiarMensajes()
+
   try {
-    const endpoint = editandoId.value ? `/api/usuarios/${editandoId.value}` : '/api/usuarios'
-    const method = editandoId.value ? 'PUT' : 'POST'
-    const body = { ...formulario }
-    if (editandoId.value && !body.password) delete body.password
- 
-    await $fetch(endpoint, { method, body })
+    if (modoFormulario.value === 'crear') {
+      const respuesta = await $fetch<UsuarioRespuesta>('/api/usuarios', {
+        method: 'POST',
+        body: {
+          perfil_id: datos.perfil_id,
+          rut: datos.rut,
+          nombres: datos.nombres,
+          apellidos: datos.apellidos,
+          email: datos.email,
+          password: datos.password,
+        },
+      })
+
+      if (!datos.activo && respuesta.usuario?.id) {
+        await $fetch(`/api/usuarios/${respuesta.usuario.id}`, {
+          method: 'PUT',
+          body: { activo: false },
+        })
+      }
+
+      mensajeExito.value = 'Usuario creado correctamente'
+    }
+    else if (elementoSeleccionado.value) {
+      const payload: Record<string, unknown> = {
+        rut: datos.rut,
+        nombres: datos.nombres,
+        apellidos: datos.apellidos,
+        email: datos.email,
+      }
+
+      if (!esUsuarioActual(elementoSeleccionado.value)) {
+        payload.perfil_id = datos.perfil_id
+        payload.activo = datos.activo
+      }
+
+      if (datos.password) {
+        payload.password = datos.password
+      }
+
+      await $fetch(`/api/usuarios/${elementoSeleccionado.value.id}`, {
+        method: 'PUT',
+        body: payload,
+      })
+
+      mensajeExito.value = 'Usuario actualizado correctamente'
+    }
+
     cerrarModal()
-    await obtenerUsuarios()
-  } catch (error) {
-    errorMsg.value = error.data?.statusMessage || 'Error al guardar el usuario'
-  } finally {
+    await cargarUsuarios()
+  }
+  catch (error) {
+    mensajeError.value = getApiErrorMessage(error, 'No se pudo guardar el usuario')
+  }
+  finally {
     guardando.value = false
   }
 }
- 
-async function cambiarEstadoUsuario(usr) {
+
+function pedirDesactivar(usuario: Usuario) {
+  limpiarMensajes()
+  elementoSeleccionado.value = usuario
+  confirmacionAbierta.value = true
+}
+
+function cerrarConfirmacion() {
+  confirmacionAbierta.value = false
+  elementoSeleccionado.value = null
+}
+
+async function desactivarUsuario() {
+  if (!elementoSeleccionado.value) {
+    return
+  }
+
+  guardando.value = true
+  limpiarMensajes()
+
   try {
-    if (usr.activo) {
-      await $fetch(`/api/usuarios/${usr.id}`, { method: 'DELETE' })
-    } else {
-      await $fetch(`/api/usuarios/${usr.id}`, { method: 'PUT', body: { activo: true } })
-    }
-    await obtenerUsuarios()
-  } catch (error) {
-    alert(error.data?.statusMessage || 'Error al cambiar el estado del usuario')
+    await $fetch(`/api/usuarios/${elementoSeleccionado.value.id}`, {
+      method: 'DELETE',
+    })
+
+    mensajeExito.value = 'Usuario desactivado correctamente'
+    cerrarConfirmacion()
+    await cargarUsuarios()
+  }
+  catch (error) {
+    mensajeError.value = getApiErrorMessage(error, 'No se pudo desactivar el usuario')
+  }
+  finally {
+    guardando.value = false
   }
 }
- 
-function solicitarEliminacion(usr) {
-  if (user.value?.id === usr.id) return
-  usuarioAEliminar.value = usr
-  mostrarConfirmacion.value = true
+
+function puedeDesactivar(usuario: Usuario): boolean {
+  return usuario.activo && !esUsuarioActual(usuario)
 }
- 
-function cancelarEliminacion() {
-  mostrarConfirmacion.value = false
-  usuarioAEliminar.value = null
+
+function esUsuarioActual(usuario: Usuario): boolean {
+  return Number(user.value?.id) === usuario.id
 }
- 
-async function confirmarEliminacion() {
-  if (!usuarioAEliminar.value) return
-  eliminando.value = true
-  try {
-    await $fetch(`/api/usuarios/${usuarioAEliminar.value.id}/eliminar`, { method: 'DELETE' })
-    mostrarConfirmacion.value = false
-    usuarioAEliminar.value = null
-    await obtenerUsuarios()
-  } catch (error) {
-    alert(error.data?.statusMessage || 'Error al eliminar el usuario')
-  } finally {
-    eliminando.value = false
-  }
+
+function limpiarMensajes() {
+  mensajeError.value = ''
+  mensajeExito.value = ''
 }
- 
+
 onMounted(() => {
-  obtenerUsuarios()
+  cargarUsuarios()
 })
+// Lógica pendiente para después:
+//
+// 1. Importar type Usuario.
+// 2. Importar type Perfil.
+// 3. Verificar que solo el administrador pueda entrar a esta página.
+// 4. Cargar usuarios desde GET /api/usuarios.
+// 5. Cargar perfiles desde GET /api/perfiles si existe endpoint.
+// 6. Filtrar por texto: rut, nombres, apellidos o email.
+// 7. Filtrar por perfil: administrador / ejecutivo.
+// 8. Filtrar por estado activo / inactivo.
+// 9. Abrir modal para crear usuario.
+// 10. Abrir modal para editar usuario.
+// 11. Crear usuario con POST /api/usuarios.
+// 12. Editar usuario con PUT /api/usuarios/:id.
+// 13. Desactivar usuario con confirmación.
+//
+// Campos reales según schema.prisma:
+// perfil_id, rut, nombres, apellidos, email,
+// password_hash, activo, created_at, updated_at.
+//
+// Importante:
+// - El frontend nunca envía password_hash.
+// - El frontend envía password normal y el backend genera el hash.
+// - El backend no debe devolver password_hash.
+// - Un usuario no debería cambiarse a sí mismo perfil_id ni activo.
+// - No se elimina físicamente el usuario.
+// - Para desactivarlo se usa activo: false.
 </script>

@@ -1,46 +1,53 @@
 import prisma from '../../utils/prisma'
- 
+
+function puedeGestionarClientes(perfil: string) {
+  return perfil === 'administrador' || perfil === 'ejecutivo'
+}
+
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
- 
-  if (session.user.perfilNombre !== 'administrador' && session.user.perfilNombre !== 'ejecutivo') {
-    throw createError({ 
-      statusCode: 403, 
-      statusMessage: 'No autorizado: Solo administradores y ejecutivos pueden dar de baja clientes' 
-    })
+
+  if (!puedeGestionarClientes(session.user.perfilNombre)) {
+    throw createError({ statusCode: 403, statusMessage: 'No autorizado para dar de baja clientes' })
   }
- 
+
   const id = Number(getRouterParam(event, 'id'))
- 
-  const cliente = await prisma.clientes.findUnique({
-    where: { id },
-    include: {
-      arriendos: {
-        where: { NOT: { estado: 'finalizado' } },
-        select: { id: true }
-      }
-    }
-  })
- 
-  if (!cliente) {
-    throw createError({ statusCode: 404, statusMessage: 'Cliente no encontrado' })
+  if (!id || Number.isNaN(id)) {
+    throw createError({ statusCode: 400, statusMessage: 'ID de cliente inválido' })
   }
- 
-  if (cliente.arriendos.length > 0) {
+
+  const arriendoVigente = await prisma.arriendos.findFirst({
+    where: {
+      cliente_id: id,
+      estado: 'vigente'
+    },
+    select: { id: true }
+  })
+
+  if (arriendoVigente) {
     throw createError({
       statusCode: 409,
-      statusMessage: 'No se puede eliminar un cliente con arriendos no finalizados.'
+      statusMessage: 'No se puede dar de baja un cliente con arriendo vigente'
     })
   }
- 
+
   try {
-    await prisma.clientes.update({
+    const cliente = await prisma.clientes.update({
       where: { id },
       data: { activo: false }
     })
-    
-    return { ok: true, mensaje: 'Cliente dado de baja exitosamente' }
-  } catch (error) {
-    throw createError({ statusCode: 500, statusMessage: 'Error interno al dar de baja' })
+
+    return {
+      ok: true,
+      mensaje: 'Cliente dado de baja exitosamente',
+      cliente
+    }
+  }
+  catch (error: any) {
+    if (error?.code === 'P2025') {
+      throw createError({ statusCode: 404, statusMessage: 'Cliente no encontrado' })
+    }
+
+    throw createError({ statusCode: 500, statusMessage: 'Error interno al dar de baja cliente' })
   }
 })

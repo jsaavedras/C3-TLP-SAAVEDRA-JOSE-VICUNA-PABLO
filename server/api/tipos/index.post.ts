@@ -4,36 +4,48 @@ export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
 
   if (session.user.perfilNombre !== 'administrador') {
-    throw createError({ statusCode: 403, statusMessage: 'No autorizado: Solo administradores' })
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Solo administradores pueden crear tipos de vehículo'
+    })
   }
 
-  const body = await readBody(event)
+  const body = await readBody(event) || {}
   const nombre = String(body.nombre || '').trim()
-  const valorDiario = Number(body.valor_diario)
+  const descripcion = String(body.descripcion || '').trim()
+  const valor_diario = Number(body.valor_diario)
 
   if (!nombre) {
-    throw createError({ statusCode: 400, statusMessage: 'El nombre del tipo es obligatorio' })
+    throw createError({ statusCode: 400, statusMessage: 'El nombre es obligatorio' })
   }
-  if (!valorDiario || valorDiario <= 0) {
-    throw createError({ statusCode: 400, statusMessage: 'El valor diario debe ser mayor a cero' })
+
+  if (!Number.isFinite(valor_diario) || valor_diario <= 0) {
+    throw createError({ statusCode: 400, statusMessage: 'El valor diario debe ser mayor a 0' })
   }
 
   try {
-    const nuevo = await prisma.tipos_vehiculo.create({
+    const tipo = await prisma.tipos_vehiculo.create({
       data: {
         nombre,
-        descripcion: body.descripcion || '',
-        valor_diario: valorDiario,
+        descripcion,
+        valor_diario: Math.trunc(valor_diario),
         activo: true
       }
     })
 
     setResponseStatus(event, 201)
-    return nuevo
-  } catch (error: any) {
-    if (error.code === 'P2002') {
+
+    return {
+      ok: true,
+      mensaje: 'Tipo de vehículo creado exitosamente',
+      tipo
+    }
+  }
+  catch (error: any) {
+    if (error?.code === 'P2002') {
       throw createError({ statusCode: 409, statusMessage: 'Ya existe un tipo de vehículo con ese nombre' })
     }
-    throw createError({ statusCode: 500, statusMessage: 'Error interno al crear el tipo de vehículo' })
+
+    throw createError({ statusCode: 500, statusMessage: 'Error interno al crear tipo de vehículo' })
   }
 })

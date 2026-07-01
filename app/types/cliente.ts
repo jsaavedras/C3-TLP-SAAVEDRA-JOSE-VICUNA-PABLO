@@ -1,6 +1,13 @@
 export interface Cliente {
   id: number
-  nombre: string
-  documento: string
-  telefono?: string
+  rut: string
+  nombres: string
+  apellidos: string
+  email: string
+  telefono: string
+  direccion: string
+  licencia_conducir: string
+  activo: boolean
+  created_at?: string
+  updated_at?: string
 }

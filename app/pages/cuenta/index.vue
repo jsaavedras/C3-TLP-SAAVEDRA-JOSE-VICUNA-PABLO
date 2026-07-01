@@ -1,139 +1,329 @@
 <template>
-  <div class="p-8 max-w-2xl mx-auto space-y-6">
-    <h1 class="text-2xl font-bold text-gray-900">Información de Cuenta</h1>
- 
-    <div class="border border-gray-200 rounded-md p-4">
-      <h3 class="text-lg font-semibold text-gray-700">Datos del usuario conectado</h3>
-      <p class="text-sm text-gray-500 mb-3">Información personal asociada a tu cuenta.</p>
-      <div class="grid grid-cols-2 gap-3 text-sm text-gray-700">
-        <div><strong>RUT:</strong> {{ user?.rut }}</div>
-        <div><strong>Perfil:</strong> <span class="uppercase font-semibold">{{ user?.perfilNombre }}</span></div>
-        <div><strong>Nombre:</strong> {{ user?.nombres }} {{ user?.apellidos }}</div>
-        <div><strong>Correo:</strong> {{ user?.email }}</div>
+  <!-- Página cuenta -->
+  <section class="cuenta-page">
+
+    <!-- Encabezado -->
+    <header class="cuenta-header">
+      <div>
+        <h1 class="cuenta-title">
+          Mi cuenta
+        </h1>
+
+        <p class="cuenta-description">
+          Revisa tus datos de usuario y cambia tu contraseña de acceso al sistema.
+        </p>
       </div>
-    </div>
- 
-    <div class="border border-gray-200 rounded-md p-4 ">
-      <h3 class="text-lg font-semibold text-gray-700">Cambiar contraseña</h3>
-      <p class="text-sm text-gray-500 mb-3">Actualiza la contraseña con la que accedes al sistema.</p>
- 
-     <form @submit.prevent="guardarPassword" class="space-y-4">
-        <UFormGroup label="Contraseña actual" required>
-          <UInput 
-            v-model="formulario.passwordActual" 
-            type="password" 
-            required 
-            placeholder="Contraseña actual"
-            :ui="{ base: 'bg-transparent text-gray-900 dark:text-gray-900 font-medium' }"
-          />
-        </UFormGroup>
- 
-        <UFormGroup label="Nueva contraseña" required help="Mínimo 6 caracteres">
-          <UInput 
-            v-model="formulario.passwordNueva" 
-            type="password" 
-            required 
-            minlength="6" 
-            placeholder="Nueva contraseña"
-            :ui="{ base: 'bg-transparent text-gray-900 dark:text-gray-900 font-medium' }"
-          />
-        </UFormGroup>
- 
-        <UFormGroup label="Confirmar nueva contraseña" required>
-          <UInput 
-            v-model="formulario.passwordNuevaConfirmacion" 
-            type="password" 
-            required 
-            minlength="6" 
-            placeholder="Confirmar nueva contraseña"
-            :ui="{ base: 'bg-transparent text-gray-900 dark:text-gray-900 font-medium' }"
-          />
-        </UFormGroup>
- 
-        <div class="min-h-[64px] flex flex-col justify-center">
-          <UAlert 
-            v-if="mensajeError" 
-            color="red" 
-            variant="soft" 
-            :title="mensajeError" 
-            :ui="{ title: 'text-red-950 dark:text-red-900 font-bold' }"
-          />
-          <UAlert 
-            v-if="mensajeExito" 
-            color="green" 
-            variant="soft" 
-            :title="mensajeExito" 
-            :ui="{ title: 'text-green-700 dark:text-green-800 font-bold' }"
-          />
+    </header>
+
+    <!-- Contenido principal -->
+    <section class="cuenta-layout">
+
+      <!-- Datos de la cuenta -->
+      <article class="cuenta-profile-card">
+
+        <header class="cuenta-card-header">
+          <h2 class="cuenta-card-title">
+            Datos del usuario
+          </h2>
+
+          <p class="cuenta-card-description">
+            Información asociada a tu sesión actual.
+          </p>
+        </header>
+
+        <div class="cuenta-profile-grid">
+
+          <div class="cuenta-profile-item">
+            <span class="cuenta-profile-label">
+              Nombres
+            </span>
+
+            <strong class="cuenta-profile-value">
+              {{ user?.nombres || 'Sin nombres' }}
+            </strong>
+          </div>
+
+          <div class="cuenta-profile-item">
+            <span class="cuenta-profile-label">
+              Apellidos
+            </span>
+
+            <strong class="cuenta-profile-value">
+              {{ user?.apellidos || 'Sin apellidos' }}
+            </strong>
+          </div>
+
+          <div class="cuenta-profile-item">
+            <span class="cuenta-profile-label">
+              RUT
+            </span>
+
+            <strong class="cuenta-profile-value">
+              {{ user?.rut || 'Sin RUT' }}
+            </strong>
+          </div>
+
+          <div class="cuenta-profile-item">
+            <span class="cuenta-profile-label">
+              Correo electrónico
+            </span>
+
+            <strong class="cuenta-profile-value">
+              {{ user?.email || 'Sin correo' }}
+            </strong>
+          </div>
+
+          <div class="cuenta-profile-item">
+            <span class="cuenta-profile-label">
+              Perfil
+            </span>
+
+            <strong class="cuenta-profile-value">
+              {{ perfilUsuario }}
+            </strong>
+          </div>
+
+          <div class="cuenta-profile-item">
+            <span class="cuenta-profile-label">
+              Estado
+            </span>
+
+            <span class="cuenta-status cuenta-status-activo">
+              Activo
+            </span>
+          </div>
+
         </div>
- 
-        <div class="flex justify-end pt-4">
-          <UButton type="submit" color="primary" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium flex items-center transition-colors" :loading="guardando">
-            Actualizar contraseña
-          </UButton>
-        </div>
-      </form>
-    </div>
- 
-    <div class="border border-gray-200 rounded-md p-4">
-      <h3 class="text-lg font-semibold text-gray-700">Cerrar sesión</h3>
-      <p class="text-sm text-gray-500 mb-3">Finaliza tu sesión actual en el sistema.</p>
-      <div class="flex justify-end">
-        <UButton color="red" variant="soft" icon="i-heroicons-arrow-left-on-rectangle" @click="cerrarSesion" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium flex items-center transition-colors">
-          Cerrar sesión
-        </UButton>
-      </div>
-    </div>
-  </div>
+
+      </article>
+
+      <!-- Cambio de contraseña -->
+      <article class="cuenta-password-card">
+
+        <header class="cuenta-card-header">
+          <h2 class="cuenta-card-title">
+            Cambiar contraseña
+          </h2>
+
+          <p class="cuenta-card-description">
+            Actualiza tu contraseña actual por una nueva contraseña segura.
+          </p>
+        </header>
+
+        <form class="cuenta-password-form" @submit.prevent="cambiarPassword">
+
+          <!-- Contraseña actual -->
+          <div class="cuenta-field">
+            <label class="cuenta-label">
+              Contraseña actual
+            </label>
+
+            <input
+              v-model="formulario.passwordActual"
+              type="password"
+              class="cuenta-input"
+              placeholder="Ingresa tu contraseña actual"
+              autocomplete="current-password"
+            >
+          </div>
+
+          <!-- Nueva contraseña -->
+          <div class="cuenta-field">
+            <label class="cuenta-label">
+              Nueva contraseña
+            </label>
+
+            <input
+              v-model="formulario.passwordNueva"
+              type="password"
+              class="cuenta-input"
+              placeholder="Mínimo 8 caracteres"
+              autocomplete="new-password"
+            >
+
+            <p class="cuenta-help">
+              La nueva contraseña debe tener al menos 8 caracteres.
+            </p>
+          </div>
+
+          <!-- Confirmar nueva contraseña -->
+          <div class="cuenta-field">
+            <label class="cuenta-label">
+              Confirmar nueva contraseña
+            </label>
+
+            <input
+              v-model="formulario.passwordConfirmacion"
+              type="password"
+              class="cuenta-input"
+              placeholder="Repite la nueva contraseña"
+              autocomplete="new-password"
+            >
+          </div>
+
+          <!-- Mensaje de error -->
+          <div v-if="mensajeError" class="cuenta-message cuenta-message-error">
+            {{ mensajeError }}
+          </div>
+
+          <!-- Mensaje de éxito -->
+          <div v-if="mensajeExito" class="cuenta-message cuenta-message-success">
+            {{ mensajeExito }}
+          </div>
+
+        </form>
+
+        <footer class="cuenta-password-actions">
+          <button type="button" class="cuenta-primary-button" :disabled="guardando" @click="cambiarPassword">
+            {{ guardando ? 'Guardando...' : 'Guardar nueva contraseña' }}
+          </button>
+        </footer>
+
+      </article>
+
+    </section>
+
+    <!-- Información de seguridad -->
+    <section class="cuenta-info-card">
+      <h2 class="cuenta-info-title">
+        Seguridad de la cuenta
+      </h2>
+
+      <p class="cuenta-info-text">
+        Por seguridad, el sistema no muestra tu contraseña actual. Si cambias la contraseña, deberás usar la nueva en tu
+        próximo inicio de sesión.
+      </p>
+    </section>
+
+  </section>
 </template>
 
-<script setup>
-import { reactive, ref } from 'vue'
- 
-const { user, clear } = useUserSession()
- 
+<script setup lang="ts">
+import { getProfileLabel } from '~/utils/formatStyle'
+import { getApiErrorMessage } from '~/utils/getApiErrorMessage'
+
+interface FormularioPassword {
+  passwordActual: string
+  passwordNueva: string
+  passwordConfirmacion: string
+}
+
+const { user } = useUserSession()
+
+const formulario = reactive<FormularioPassword>({
+  passwordActual: '',
+  passwordNueva: '',
+  passwordConfirmacion: '',
+})
+
 const guardando = ref(false)
 const mensajeError = ref('')
 const mensajeExito = ref('')
- 
-const formulario = reactive({
-  passwordActual: '',
-  passwordNueva: '',
-  passwordNuevaConfirmacion: ''
+
+const perfilUsuario = computed(() => {
+  return user.value?.perfilNombre ? getProfileLabel(user.value.perfilNombre) : 'Sin perfil'
 })
- 
-async function guardarPassword() {
+
+function limpiarMensajes() {
   mensajeError.value = ''
   mensajeExito.value = ''
- 
-  if (formulario.passwordNueva !== formulario.passwordNuevaConfirmacion) {
-    mensajeError.value = 'La confirmación de la nueva contraseña no coincide'
+}
+
+function limpiarFormulario() {
+  formulario.passwordActual = ''
+  formulario.passwordNueva = ''
+  formulario.passwordConfirmacion = ''
+}
+
+function validarFormulario() {
+  if (!formulario.passwordActual) {
+    mensajeError.value = 'Debes ingresar tu contraseña actual'
+    return false
+  }
+
+  if (!formulario.passwordNueva) {
+    mensajeError.value = 'Debes ingresar una nueva contraseña'
+    return false
+  }
+
+  if (formulario.passwordNueva.length < 8) {
+    mensajeError.value = 'La nueva contraseña debe tener al menos 8 caracteres'
+    return false
+  }
+
+  if (formulario.passwordNueva !== formulario.passwordConfirmacion) {
+    mensajeError.value = 'La confirmación no coincide con la nueva contraseña'
+    return false
+  }
+
+  return true
+}
+
+async function cambiarPassword() {
+  limpiarMensajes()
+
+  if (!validarFormulario()) {
     return
   }
- 
+
   guardando.value = true
+
   try {
     await $fetch('/api/cuenta/password', {
       method: 'PUT',
-      body: { ...formulario }
+      body: {
+        passwordActual: formulario.passwordActual,
+        passwordNueva: formulario.passwordNueva,
+      },
     })
+
+    limpiarFormulario()
     mensajeExito.value = 'Contraseña actualizada correctamente'
-    formulario.passwordActual = ''
-    formulario.passwordNueva = ''
-    formulario.passwordNuevaConfirmacion = ''
-  } catch (error) {
-    mensajeError.value = error.data?.statusMessage || 'No se pudo actualizar la contraseña'
-  } finally {
+  }
+  catch (error) {
+    mensajeError.value = getApiErrorMessage(error, 'No se pudo cambiar la contraseña')
+  }
+  finally {
     guardando.value = false
   }
 }
- 
-async function cerrarSesion() {
-  try {
-    await $fetch('/api/auth/logout', { method: 'POST' })
-  } finally {
-    await clear()
-    navigateTo('/login')
-  }
-}
+
+// Lógica pendiente para después:
+//
+// 1. Obtener usuario de sesión:
+// const { user } = useUserSession()
+//
+// 2. Mostrar datos reales:
+// user.value?.nombres
+// user.value?.apellidos
+// user.value?.rut
+// user.value?.email
+// user.value?.perfilNombre
+//
+// 3. Crear refs para:
+// - passwordActual
+// - passwordNueva
+// - passwordConfirmacion
+// - mensajeError
+// - mensajeExito
+// - cargando
+//
+// 4. Validar antes de enviar:
+// - contraseña actual obligatoria
+// - nueva contraseña obligatoria
+// - nueva contraseña mínimo 8 caracteres
+// - confirmación debe coincidir con nueva contraseña
+//
+// 5. Enviar PUT a:
+// /api/cuenta/password
+//
+// Datos que esta página debe enviar:
+// - password_actual
+// - password_nueva
+//
+// Reglas importantes:
+// - El frontend nunca trabaja con password_hash.
+// - El backend valida la contraseña actual.
+// - El backend no permite reutilizar la contraseña actual.
+// - El backend genera el nuevo hash.
 </script>

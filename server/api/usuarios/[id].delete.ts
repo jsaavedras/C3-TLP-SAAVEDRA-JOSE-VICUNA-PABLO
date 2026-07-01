@@ -2,39 +2,51 @@ import prisma from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
+
   if (session.user.perfilNombre !== 'administrador') {
     throw createError({
       statusCode: 403,
-      statusMessage: 'No autorizado: Solo administradores pueden desactivar usuarios'
+      statusMessage: 'Solo administradores pueden desactivar usuarios'
     })
   }
 
   const id = Number(getRouterParam(event, 'id'))
   if (!id || Number.isNaN(id)) {
-    throw createError({ statusCode: 400, statusMessage: 'ID inválido' })
+    throw createError({ statusCode: 400, statusMessage: 'ID de usuario inválido' })
   }
 
-  if (session.user.id === id) {
+  if (Number(session.user.id) === id) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Operación denegada: Administrador no puede desactivar su propia cuenta'
+      statusMessage: 'No puedes desactivar tu propia cuenta'
     })
   }
 
   try {
-    await prisma.usuarios.update({
+    const usuario = await prisma.usuarios.update({
       where: { id },
-      data: { activo: false }
+      data: { activo: false },
+      select: {
+        id: true,
+        rut: true,
+        nombres: true,
+        apellidos: true,
+        email: true,
+        activo: true
+      }
     })
 
     return {
       ok: true,
-      mensaje: 'Usuario desactivado exitosamente del sistema'
+      mensaje: 'Usuario desactivado exitosamente',
+      usuario
     }
-  } catch (error) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Error interno del servidor al intentar desactivar el usuario'
-    })
+  }
+  catch (error: any) {
+    if (error?.code === 'P2025') {
+      throw createError({ statusCode: 404, statusMessage: 'Usuario no encontrado' })
+    }
+
+    throw createError({ statusCode: 500, statusMessage: 'Error interno al desactivar usuario' })
   }
 })

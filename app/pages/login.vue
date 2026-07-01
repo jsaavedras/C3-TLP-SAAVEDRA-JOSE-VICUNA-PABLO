@@ -1,86 +1,136 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-    <UCard class="w-full max-w-md shadow-lg">
-      <template #header>
-        <div class="text-center">
-          <h2 class="text-2xl font-bold text-gray-400">RentaCar Central</h2>
-          <p class="text-sm text-gray-300 mt-1">Ingresa a tu cuenta para continuar</p>
+  <!-- Página de inicio de sesión -->
+  <section class="login-page">
+
+    <!-- Contenedor principal de la página de inicio de sesión -->
+    <div class="login-layout">
+
+      <!-- Parte de texto -->
+      <div class="login-info">
+
+        <!-- Caja de información -->
+        <div class="login-info-box">
+
+
+          <!-- Título de la información -->
+          <h1 class="login-info-title">
+            Arriendo de vehículos
+          </h1>
+
+          <!-- Texto de la información -->
+          <p class="login-info-text">
+            Sistema de gestión para administradores y ejecutivos.
+          </p>
+
         </div>
-      </template>
 
-      <form @submit.prevent="hacerLogin" class="space-y-4">
-        <UFormGroup label="Correo Electrónico" required>
-          <UInput 
-            v-model="email" 
-            type="email" 
-            icon="i-heroicons-envelope" 
-            placeholder="admin@arriendos.cl"
-            required
-          />
-        </UFormGroup>
+      </div>
 
-        <UFormGroup label="Contraseña" required>
-          <UInput 
-            v-model="password" 
-            type="password" 
-            icon="i-heroicons-lock-closed" 
-            placeholder="******"
-            required
-          />
-        </UFormGroup>
+      <!-- Parte del formulario -->
+      <div class="login-form-side">
 
-        <UAlert
-          v-if="errorMsg"
-          color="red"
-          variant="soft"
-          icon="i-heroicons-exclamation-triangle"
-          :title="errorMsg"
-        />
 
-        <UButton 
-          type="submit" 
-          block 
-          color="primary" 
-          :loading="cargando"
-        >
-          Iniciar Sesión
-        </UButton>
-      </form>
-    </UCard>
-  </div>
+        <!-- Tarjeta de inicio de sesión -->
+        <div class="login-card">
+
+
+          <!-- Título de inicio de sesión -->
+          <h2 class="login-title">
+            Iniciar sesión
+          </h2>
+
+          <!-- Formulario de inicio de sesión -->
+          <form @submit.prevent="iniciarSesion">
+
+
+            <!-- Campo de correo electrónico -->
+            <div class="login-field">
+
+              <!-- label es el texto que se muestra al usuario para indicar qué debe ingresar en el campo de correo electrónico -->
+              <label for="email" class="login-label">
+                Correo electrónico
+              </label>
+
+
+              <!-- v-model= Conexión a la variable email y input es el campo de entrada -->
+              <input class="login-input" id="email" v-model="email" type="email" placeholder="Ingrese su correo"
+                required autocomplete="email">
+            </div>
+
+
+            <!-- Campo de contraseña -->
+            <div class="login-field">
+
+
+              <!-- label es el texto que se muestra al usuario para indicar qué debe ingresar en el campo de contraseña -->
+              <label for="password" class="login-label">
+                Contraseña
+              </label>
+
+              <!-- v-model= Conexión a la variable password y input es el campo de entrada -->
+              <input class="login-input" id="password" v-model="password" type="password"
+                placeholder="Ingrese su contraseña" required autocomplete="current-password">
+            </div>
+
+
+            <!-- Muestra el mensaje de error si existe -->
+            <p v-if="error" class="login-error">
+              {{ error }}
+            </p>
+
+
+            <!-- Botón de inicio de sesión -->
+            <button class="login-button" type="submit" :disabled="cargando">
+              <!-- Muestra un mensaje diferente en el botón dependiendo de si se está procesando la solicitud de inicio de sesión o no -->
+              {{ cargando ? 'Iniciando sesión...' : 'Iniciar sesión' }}
+
+            </button>
+
+
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </section>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
 
-const email = ref('')
-const password = ref('')
-const errorMsg = ref('')
-const cargando = ref(false)
+definePageMeta({
+  layout: 'auth'
+})
 
-const { fetch: actualizarSesion } = useUserSession()
+const email = ref('') // Variable para almacenar el correo electrónico ingresado por el usuario
+const password = ref('') // Variable para almacenar la contraseña ingresada por el usuario
+const error = ref('') // Variable para almacenar el mensaje de error en caso de que las credenciales sean inválidas
+const cargando = ref(false) // Variable para indicar si se está procesando la solicitud de inicio de sesión
+const { fetch: fetchSession } = useUserSession() // Función para actualizar la sesión del usuario después de iniciar sesión
 
-async function hacerLogin() {
-  cargando.value = true
-  errorMsg.value = ''
+// Función para manejar el inicio de sesión
+async function iniciarSesion() {
 
+  error.value = '' // Reinicia el mensaje de error antes de intentar iniciar sesión
+  cargando.value = true // Indica que se está procesando la solicitud de inicio de sesión
+
+
+  // Realiza la solicitud de inicio de sesión al servidor
   try {
-    const respuesta = await $fetch('/api/auth/login', {
+    // Llamada a la API para iniciar sesión
+    await $fetch('/api/auth/login', {
       method: 'POST',
       body: {
         email: email.value,
         password: password.value
       }
     })
-
-    if (respuesta.ok) {
-      await actualizarSesion()
-      navigateTo('/')
-    }
-  } catch (error) {
-    errorMsg.value = error.data?.statusMessage || 'Error al conectar con el servidor.'
-  } finally {
-    cargando.value = false
+    await fetchSession() // Actualiza la sesión del usuario después de iniciar sesión
+    await navigateTo('/dashboard') // Redirige al usuario a la página principal después de iniciar sesión
   }
+  // Maneja los errores de inicio de sesión
+  catch { error.value = 'Credenciales inválidas' }
+
+  // Asegura que la variable cargando se establezca en false para que el usuario pueda volver a intentar iniciar sesión
+  finally { cargando.value = false }
 }
 </script>

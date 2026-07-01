@@ -1,4 +1,3278 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
-/* Estilos globales del sistema de arriendo de vehiculos. */
+/* =========================================================
+   01. LAYOUTS
+========================================================= */
+
+/* ---------------------------------------------------------
+   01.1 LAYOUT DEFAULT
+   Archivo: app/layouts/default.vue
+--------------------------------------------------------- */
+
+.admin-layout {
+  @apply min-h-screen flex bg-gray-100 text-slate-900;
+}
+
+.admin-sidebar {
+  @apply w-65 min-h-screen shrink-0 bg-gray-900 text-white z-20;
+}
+
+.admin-content {
+  @apply flex-1 min-w-0 flex flex-col bg-gray-100 text-slate-900;
+}
+
+.admin-page {
+  @apply flex-1 p-8 bg-gray-100 text-slate-900;
+}
+
+/* ---------------------------------------------------------
+   01.2 LAYOUT AUTH
+   Archivo: app/layouts/auth.vue
+--------------------------------------------------------- */
+
+.auth-layout {
+  @apply min-h-screen;
+}
+
+/* =========================================================
+   02. COMPONENTES
+========================================================= */
+
+/* ---------------------------------------------------------
+   02.1 COMPONENTE APPNAVBAR
+   Archivo: app/components/AppNavbar.vue
+--------------------------------------------------------- */
+
+.app-navbar {
+  @apply min-h-16 flex items-center justify-between gap-4 px-8 bg-blue-900 text-white;
+}
+
+.app-navbar-brand {
+  @apply text-white text-base font-extrabold whitespace-nowrap;
+}
+
+.app-navbar-user {
+  @apply flex items-center gap-3;
+}
+
+.app-navbar-user-info {
+  @apply flex flex-col items-end justify-center gap-0.5 leading-none;
+}
+
+.app-navbar-user-name {
+  @apply text-white text-sm font-extrabold;
+}
+
+.app-navbar-user-role {
+  @apply text-blue-100 text-xs;
+}
+
+.app-navbar-button {
+  @apply min-h-9 px-4 py-2 border border-white rounded-md bg-white text-blue-900 text-sm font-bold cursor-pointer;
+}
+
+.app-navbar-button:hover {
+  @apply bg-blue-50;
+}
+
+.app-navbar-button:disabled {
+  @apply opacity-60 cursor-not-allowed;
+}
+
+/* ---------------------------------------------------------
+   02.2 COMPONENTE APPSIDEBAR
+   Archivo: app/components/AppSidebar.vue
+--------------------------------------------------------- */
+
+.app-sidebar {
+  @apply min-h-screen flex flex-col p-5 bg-gray-900 text-white;
+}
+
+.app-sidebar-header {
+  @apply flex items-baseline gap-1 mb-6;
+}
+
+.app-sidebar-title {
+  @apply text-white text-lg font-extrabold;
+}
+
+.app-sidebar-subtitle {
+  @apply text-gray-400 text-sm;
+}
+
+.app-sidebar-nav {
+  @apply flex flex-col gap-2;
+}
+
+.app-sidebar-link {
+  @apply flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 text-sm font-bold no-underline;
+}
+
+.app-sidebar-link:hover {
+  @apply bg-gray-800 text-white;
+}
+
+.app-sidebar-link-active {
+  @apply bg-blue-600 text-white;
+}
+
+.app-sidebar-icon {
+  @apply w-6 text-center;
+}
+
+.app-sidebar-text {
+  @apply text-inherit;
+}
+
+.app-sidebar-footer {
+  @apply mt-6 pt-4 text-white text-sm;
+}
+
+.app-sidebar-footer-label {
+  @apply font-extrabold;
+}
+
+.app-sidebar-footer-role {
+  @apply ml-1 text-gray-300;
+}
+
+/* ---------------------------------------------------------
+   02.3 COMPONENTE BOTÓN SIDEBAR MÓVIL
+   Archivo: app/layouts/default.vue
+--------------------------------------------------------- */
+
+.mobile-sidebar-button {
+  @apply hidden;
+}
+
+.mobile-sidebar-backdrop {
+  @apply hidden;
+}
+
+
+
+
+/* =========================================================
+   03. PÁGINAS
+========================================================= */
+
+/* ---------------------------------------------------------
+   03.1 PÁGINA LOGIN
+   Archivo: app/pages/login.vue
+--------------------------------------------------------- */
+
+.login-page {
+  @apply min-h-screen flex items-center justify-center p-8 bg-cover bg-center;
+  background-image:
+    linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.72)),
+    url("/usm_vina.jpg");
+}
+
+.login-layout {
+  @apply w-full max-w-262.5 grid grid-cols-[1.1fr_0.9fr] overflow-hidden rounded-3xl bg-white shadow-2xl;
+}
+
+.login-info {
+  @apply flex items-center p-12 bg-linear-to-br from-blue-900 to-blue-600 text-white;
+}
+
+.login-info-box {
+  @apply max-w-107.5;
+}
+
+.login-info-title {
+  @apply m-0 mb-4 text-white text-4xl leading-tight font-black;
+}
+
+.login-info-text {
+  @apply m-0 text-blue-100 leading-relaxed;
+}
+
+.login-form-side {
+  @apply flex items-center justify-center p-12 bg-white;
+}
+
+.login-card {
+  @apply w-full max-w-sm;
+}
+
+.login-title {
+  @apply m-0 mb-6 text-slate-900 text-2xl font-extrabold;
+}
+
+.login-field {
+  @apply flex flex-col gap-2 mb-4;
+}
+
+.login-label {
+  @apply text-slate-700 text-sm font-bold;
+}
+
+.login-input {
+  @apply w-full min-h-11 px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-900;
+}
+
+.login-input:focus {
+  @apply outline-none border-blue-600 ring-4 ring-blue-600/15;
+}
+
+.login-error {
+  @apply m-0 mb-4 p-3 rounded-xl bg-red-50 text-red-800 text-sm font-bold;
+}
+
+.login-button {
+  @apply w-full min-h-11 border-0 rounded-xl bg-blue-600 text-white font-extrabold cursor-pointer;
+}
+
+.login-button:hover {
+  @apply bg-blue-700;
+}
+
+.login-button:disabled {
+  @apply opacity-60 cursor-not-allowed;
+}
+
+@media (max-width: 640px) {
+  .login-page {
+    @apply p-4;
+  }
+
+  .login-layout {
+    @apply grid-cols-1;
+  }
+
+  .login-info {
+    @apply p-8;
+  }
+
+  .login-info-title {
+    @apply text-3xl;
+  }
+
+  .login-form-side {
+    @apply p-8;
+  }
+}
+
+/* ---------------------------------------------------------
+   03.2 PÁGINA DASHBOARD
+   Archivo: app/pages/dashboard.vue
+--------------------------------------------------------- */
+
+.dashboard-page {
+  @apply w-full max-w-7xl mx-auto text-slate-900;
+}
+
+.dashboard-header {
+  @apply flex items-start justify-between gap-6 mb-6;
+}
+
+.dashboard-header-left {
+  @apply max-w-3xl;
+}
+
+.dashboard-title {
+  @apply m-0 text-slate-900 text-3xl font-extrabold;
+}
+
+.dashboard-description {
+  @apply mt-2 mb-0 text-slate-600 leading-relaxed;
+}
+
+.dashboard-summary-grid {
+  @apply grid grid-cols-4 gap-4 my-8;
+}
+
+.dashboard-summary-card {
+  @apply p-5 border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.dashboard-summary-label {
+  @apply m-0 mb-3 text-slate-600 text-sm;
+}
+
+.dashboard-summary-value {
+  @apply m-0 text-slate-900 text-3xl font-black leading-none;
+}
+
+.dashboard-summary-text {
+  @apply mt-3 mb-0 text-slate-500 text-sm;
+}
+
+.dashboard-grid {
+  @apply grid grid-cols-2 gap-4;
+}
+
+.dashboard-panel {
+  @apply p-5 border border-gray-300 rounded-2xl bg-white text-slate-900 shadow-md;
+}
+
+.dashboard-panel-title {
+  @apply m-0 text-slate-900 text-lg font-extrabold;
+}
+
+.dashboard-status-list {
+  @apply flex flex-col gap-3 mt-4;
+}
+
+.dashboard-status-item {
+  @apply grid grid-cols-[1fr_auto] gap-3 items-center p-4 border border-gray-200 rounded-xl bg-slate-50;
+}
+
+.dashboard-status-title {
+  @apply m-0 text-slate-900 text-base font-extrabold;
+}
+
+.dashboard-status-text {
+  @apply mt-1 mb-0 text-slate-500 text-sm;
+}
+
+.dashboard-status-badge {
+  @apply inline-flex items-center justify-center min-h-7 min-w-8 px-3 py-1 rounded-full text-xs font-extrabold whitespace-nowrap;
+}
+
+.dashboard-status-disponible {
+  @apply bg-green-100 text-green-800;
+}
+
+.dashboard-status-arrendado {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.dashboard-status-mantenimiento {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.dashboard-status-baja {
+  @apply bg-red-100 text-red-800;
+}
+
+.dashboard-rentals-list {
+  @apply flex flex-col gap-3 mt-4;
+}
+
+.dashboard-rental-card {
+  @apply p-4 border border-gray-200 rounded-xl bg-slate-50;
+}
+
+.dashboard-rental-header {
+  @apply grid grid-cols-[1fr_auto] gap-3 items-start;
+}
+
+.dashboard-rental-title {
+  @apply m-0 text-slate-900 text-base font-extrabold;
+}
+
+.dashboard-rental-subtitle {
+  @apply mt-1 mb-0 text-slate-500 text-sm;
+}
+
+.dashboard-rental-body {
+  @apply grid grid-cols-3 gap-3 mt-4;
+}
+
+.dashboard-rental-field {
+  @apply p-3 border border-gray-200 rounded-xl bg-white;
+}
+
+.dashboard-rental-label {
+  @apply block mb-1 text-slate-500 text-xs font-bold;
+}
+
+.dashboard-rental-value {
+  @apply text-slate-900 text-sm font-extrabold;
+}
+
+.dashboard-empty {
+  @apply p-5 border border-dashed border-slate-300 rounded-xl bg-white text-center;
+}
+
+.dashboard-empty-title {
+  @apply m-0 text-slate-900 text-base font-extrabold;
+}
+
+.dashboard-empty-text {
+  @apply mt-2 mb-0 text-slate-500 text-sm;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-header {
+    @apply flex-col items-stretch;
+  }
+
+  .dashboard-summary-grid {
+    @apply grid-cols-2;
+  }
+
+  .dashboard-grid {
+    @apply grid-cols-1;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-summary-grid {
+    @apply grid-cols-1;
+  }
+
+  .dashboard-status-item {
+    @apply grid-cols-1;
+  }
+
+  .dashboard-rental-header {
+    @apply grid-cols-1;
+  }
+
+  .dashboard-rental-body {
+    @apply grid-cols-1;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-title {
+    @apply text-2xl;
+  }
+}
+
+/* ---------------------------------------------------------
+   03.3 PÁGINA NO AUTORIZADO
+   Archivo: app/pages/no-autorizado.vue
+--------------------------------------------------------- */
+
+.unauthorized-page {
+  @apply min-h-[calc(100vh-8rem)] flex items-center justify-center;
+}
+
+.unauthorized-card {
+  @apply w-full max-w-xl p-8 border border-gray-300 rounded-2xl bg-white text-center shadow-xl;
+}
+
+.unauthorized-icon {
+  @apply w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-red-100 text-red-800 text-3xl;
+}
+
+.unauthorized-title {
+  @apply m-0 text-slate-900 text-2xl font-extrabold;
+}
+
+.unauthorized-text {
+  @apply mt-3 mb-6 text-slate-500 leading-relaxed;
+}
+
+.unauthorized-button {
+  @apply inline-flex items-center justify-center min-h-10 px-4 py-3 rounded-xl bg-blue-600 text-white text-sm font-extrabold no-underline;
+}
+
+.unauthorized-button:hover {
+  @apply bg-blue-700;
+}
+
+@media (max-width: 640px) {
+  .unauthorized-card {
+    @apply p-6;
+  }
+}
+
+/* ---------------------------------------------------------
+   03.4 PÁGINA VEHÍCULOS
+   Archivo: app/pages/vehiculos/index.vue
+--------------------------------------------------------- */
+
+.vehicles-page {
+  @apply w-full max-w-7xl mx-auto text-slate-900;
+}
+
+.vehicles-header {
+  @apply flex items-start justify-between gap-6 mb-6;
+}
+
+.vehicles-title {
+  @apply m-0 text-slate-900 text-3xl font-extrabold;
+}
+
+.vehicles-description {
+  @apply mt-2 mb-0 text-slate-600 leading-relaxed;
+}
+
+.vehicles-header-actions {
+  @apply flex items-center gap-3;
+}
+
+.vehicles-summary-grid {
+  @apply grid grid-cols-4 gap-4 my-8;
+}
+
+.vehicles-summary-card {
+  @apply p-5 border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.vehicles-summary-label {
+  @apply block mb-3 text-slate-600 text-sm;
+}
+
+.vehicles-summary-value {
+  @apply block text-slate-900 text-3xl font-black leading-none;
+}
+
+.vehicles-summary-text {
+  @apply mt-3 mb-0 text-slate-500 text-sm;
+}
+
+.vehicles-filters-card {
+  @apply p-5 mb-6 border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.vehicles-filters-grid {
+  @apply grid grid-cols-[1fr_240px] gap-4;
+}
+
+.vehicles-field {
+  @apply flex flex-col gap-2;
+}
+
+.vehicles-label {
+  @apply text-slate-700 text-sm font-bold;
+}
+
+.vehicles-input,
+.vehicles-select {
+  @apply w-full min-h-11 px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-900;
+}
+
+.vehicles-input:focus,
+.vehicles-select:focus {
+  @apply outline-none border-blue-600 ring-4 ring-blue-600/15;
+}
+
+.vehicles-grid {
+  @apply grid grid-cols-3 gap-4;
+}
+
+.vehicles-card {
+  @apply overflow-hidden border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.vehicles-card-image {
+  @apply h-44 flex items-center justify-center border-b border-gray-200 bg-slate-50 text-slate-500;
+}
+
+.vehicles-card-image-text {
+  @apply text-sm font-bold;
+}
+
+.vehicles-card-content {
+  @apply p-4;
+}
+
+.vehicles-card-header {
+  @apply flex items-start justify-between gap-3 mb-4;
+}
+
+.vehicles-card-title {
+  @apply m-0 text-slate-900 text-lg font-extrabold;
+}
+
+.vehicles-card-subtitle {
+  @apply mt-1 mb-0 text-slate-500 text-sm;
+}
+
+.vehicles-status {
+  @apply inline-flex items-center justify-center min-h-7 px-3 py-1 rounded-full text-xs font-extrabold whitespace-nowrap;
+}
+
+.vehicles-status-disponible {
+  @apply bg-green-100 text-green-800;
+}
+
+.vehicles-status-arrendado {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.vehicles-status-mantenimiento {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.vehicles-status-baja {
+  @apply bg-red-100 text-red-800;
+}
+
+.vehicles-info-grid {
+  @apply grid grid-cols-2 gap-3;
+}
+
+.vehicles-info-item {
+  @apply p-3 border border-gray-200 rounded-xl bg-slate-50;
+}
+
+.vehicles-info-label {
+  @apply block mb-1 text-slate-500 text-xs font-bold;
+}
+
+.vehicles-info-value {
+  @apply text-slate-900 text-sm font-extrabold;
+}
+
+.vehicles-card-actions {
+  @apply flex items-center gap-2 flex-wrap mt-4;
+}
+
+.vehicles-primary-button,
+.vehicles-secondary-button,
+.vehicles-warning-button,
+.vehicles-danger-button {
+  @apply inline-flex items-center justify-center min-h-10 px-4 py-3 border border-transparent rounded-xl text-sm font-extrabold cursor-pointer;
+}
+
+.vehicles-primary-button {
+  @apply bg-blue-600 text-white;
+}
+
+.vehicles-primary-button:hover {
+  @apply bg-blue-700;
+}
+
+.vehicles-secondary-button {
+  @apply border-slate-300 bg-white text-slate-700;
+}
+
+.vehicles-secondary-button:hover {
+  @apply bg-slate-50;
+}
+
+.vehicles-warning-button {
+  @apply bg-yellow-500 text-gray-900;
+}
+
+.vehicles-warning-button:hover {
+  @apply bg-yellow-600;
+}
+
+.vehicles-danger-button {
+  @apply bg-red-600 text-white;
+}
+
+.vehicles-danger-button:hover {
+  @apply bg-red-700;
+}
+
+.vehicles-empty {
+  @apply p-8 mt-4 border border-dashed border-slate-300 rounded-2xl bg-white text-center;
+}
+
+.vehicles-empty-title {
+  @apply m-0 text-slate-900 text-xl font-extrabold;
+}
+
+.vehicles-empty-text {
+  @apply mt-2 mb-0 text-slate-500;
+}
+
+.vehicles-modal-backdrop,
+.vehicles-confirm-backdrop {
+  @apply fixed inset-0 z-200 flex items-center justify-center p-4 bg-slate-900/60;
+}
+
+.vehicles-modal {
+  @apply w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-2xl;
+}
+
+.vehicles-modal-header,
+.vehicles-confirm-header {
+  @apply flex items-center justify-between gap-4 p-5 border-b border-gray-200;
+}
+
+.vehicles-modal-title,
+.vehicles-confirm-title {
+  @apply m-0 text-slate-900 text-xl font-extrabold;
+}
+
+.vehicles-modal-close {
+  @apply w-9 h-9 border-0 rounded-lg bg-slate-100 text-slate-700 text-2xl cursor-pointer;
+}
+
+.vehicles-form {
+  @apply grid grid-cols-2 gap-4 p-5;
+}
+
+.vehicles-modal-actions,
+.vehicles-confirm-actions {
+  @apply flex justify-end gap-3 p-5 border-t border-gray-200;
+}
+
+.vehicles-confirm-modal {
+  @apply w-full max-w-md rounded-2xl bg-white shadow-2xl;
+}
+
+.vehicles-confirm-text {
+  @apply m-0 p-5 text-slate-600 leading-relaxed;
+}
+
+@media (max-width: 1024px) {
+  .vehicles-header {
+    @apply flex-col items-stretch;
+  }
+
+  .vehicles-header-actions {
+    @apply w-full;
+  }
+
+  .vehicles-header-actions .vehicles-primary-button {
+    @apply w-full;
+  }
+
+  .vehicles-summary-grid {
+    @apply grid-cols-2;
+  }
+
+  .vehicles-filters-grid {
+    @apply grid-cols-1;
+  }
+
+  .vehicles-grid {
+    @apply grid-cols-2;
+  }
+
+  .vehicles-form {
+    @apply grid-cols-1;
+  }
+}
+
+@media (max-width: 640px) {
+  .vehicles-summary-grid,
+  .vehicles-grid {
+    @apply grid-cols-1;
+  }
+
+  .vehicles-card-header {
+    @apply flex-col;
+  }
+
+  .vehicles-info-grid {
+    @apply grid-cols-1;
+  }
+
+  .vehicles-card-actions {
+    @apply flex-col items-stretch;
+  }
+
+  .vehicles-card-actions button,
+  .vehicles-modal-actions button,
+  .vehicles-confirm-actions button {
+    @apply w-full;
+  }
+
+  .vehicles-modal-actions,
+  .vehicles-confirm-actions {
+    @apply flex-col-reverse;
+  }
+}
+
+/* ---------------------------------------------------------
+   03.5 PÁGINA ARRIENDOS
+   Archivo: app/pages/arriendos/index.vue
+--------------------------------------------------------- */
+
+.arriendos-page {
+  @apply w-full max-w-7xl mx-auto text-slate-900;
+}
+
+.arriendos-header {
+  @apply flex items-start justify-between gap-6 mb-6;
+}
+
+.arriendos-title {
+  @apply m-0 text-slate-900 text-3xl font-extrabold;
+}
+
+.arriendos-description {
+  @apply mt-2 mb-0 text-slate-600 leading-relaxed;
+}
+
+.arriendos-header-actions {
+  @apply flex items-center gap-3;
+}
+
+.arriendos-primary-link,
+.arriendos-secondary-link,
+.arriendos-warning-link {
+  @apply inline-flex items-center justify-center min-h-10 px-4 py-3 border border-transparent rounded-xl text-sm font-extrabold no-underline whitespace-nowrap;
+}
+
+.arriendos-primary-link {
+  @apply bg-blue-600 text-white;
+}
+
+.arriendos-primary-link:hover {
+  @apply bg-blue-700;
+}
+
+.arriendos-secondary-link {
+  @apply border-slate-300 bg-white text-slate-700;
+}
+
+.arriendos-secondary-link:hover {
+  @apply bg-slate-50;
+}
+
+.arriendos-warning-link {
+  @apply bg-yellow-500 text-gray-900;
+}
+
+.arriendos-warning-link:hover {
+  @apply bg-yellow-600;
+}
+
+.arriendos-summary-grid {
+  @apply grid grid-cols-4 gap-4 my-8;
+}
+
+.arriendos-summary-card {
+  @apply p-5 border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.arriendos-summary-label {
+  @apply block mb-3 text-slate-600 text-sm;
+}
+
+.arriendos-summary-value {
+  @apply block text-slate-900 text-3xl font-black leading-none;
+}
+
+.arriendos-summary-text {
+  @apply mt-3 mb-0 text-slate-500 text-sm;
+}
+
+.arriendos-filters-card {
+  @apply p-5 mb-6 border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.arriendos-filters-grid {
+  @apply grid grid-cols-[1fr_240px] gap-4;
+}
+
+.arriendos-field {
+  @apply flex flex-col gap-2;
+}
+
+.arriendos-label {
+  @apply text-slate-700 text-sm font-bold;
+}
+
+.arriendos-input,
+.arriendos-select {
+  @apply w-full min-h-11 px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-900;
+}
+
+.arriendos-input:focus,
+.arriendos-select:focus {
+  @apply outline-none border-blue-600 ring-4 ring-blue-600/15;
+}
+
+.arriendos-table-card {
+  @apply overflow-hidden border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.arriendos-table-wrapper {
+  @apply w-full overflow-x-auto;
+}
+
+.arriendos-table {
+  @apply w-full border-collapse;
+}
+
+.arriendos-table th,
+.arriendos-table td {
+  @apply px-4 py-3 border-b border-gray-200 text-left align-middle;
+}
+
+.arriendos-table th {
+  @apply bg-slate-50 text-slate-700 text-xs font-extrabold uppercase tracking-wide;
+}
+
+.arriendos-table td {
+  @apply text-slate-900 text-sm;
+}
+
+.arriendos-table tr:last-child td {
+  @apply border-b-0;
+}
+
+.arriendos-table-actions {
+  @apply flex items-center gap-2;
+}
+
+.arriendos-status {
+  @apply inline-flex items-center justify-center min-h-7 px-3 py-1 rounded-full text-xs font-extrabold whitespace-nowrap;
+}
+
+.arriendos-status-vigente {
+  @apply bg-green-100 text-green-800;
+}
+
+.arriendos-status-finalizado {
+  @apply bg-red-100 text-red-800;
+}
+
+.arriendos-mobile-list {
+  @apply hidden;
+}
+
+.arriendos-mobile-card {
+  @apply p-4 border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.arriendos-mobile-card-header {
+  @apply flex items-start justify-between gap-3 mb-4;
+}
+
+.arriendos-mobile-card-title {
+  @apply m-0 text-slate-900 text-lg font-extrabold;
+}
+
+.arriendos-mobile-card-subtitle {
+  @apply mt-1 mb-0 text-slate-500 text-sm;
+}
+
+.arriendos-mobile-info-grid {
+  @apply grid grid-cols-2 gap-3;
+}
+
+.arriendos-mobile-info-item {
+  @apply p-3 border border-gray-200 rounded-xl bg-slate-50;
+}
+
+.arriendos-mobile-info-label {
+  @apply block mb-1 text-slate-500 text-xs font-bold;
+}
+
+.arriendos-mobile-info-value {
+  @apply text-slate-900 text-sm font-extrabold;
+}
+
+.arriendos-mobile-actions {
+  @apply flex items-center gap-2 flex-wrap mt-4;
+}
+
+.arriendos-empty {
+  @apply p-8 mt-4 border border-dashed border-slate-300 rounded-2xl bg-white text-center;
+}
+
+.arriendos-empty-title {
+  @apply m-0 text-slate-900 text-xl font-extrabold;
+}
+
+.arriendos-empty-text {
+  @apply mt-2 mb-0 text-slate-500;
+}
+
+@media (max-width: 1024px) {
+  .arriendos-header {
+    @apply flex-col items-stretch;
+  }
+
+  .arriendos-header-actions {
+    @apply w-full;
+  }
+
+  .arriendos-primary-link {
+    @apply w-full;
+  }
+
+  .arriendos-summary-grid {
+    @apply grid-cols-2;
+  }
+
+  .arriendos-filters-grid {
+    @apply grid-cols-1;
+  }
+}
+
+@media (max-width: 768px) {
+  .arriendos-table-card {
+    @apply hidden;
+  }
+
+  .arriendos-mobile-list {
+    @apply grid gap-4;
+  }
+}
+
+@media (max-width: 640px) {
+  .arriendos-summary-grid {
+    @apply grid-cols-1;
+  }
+
+  .arriendos-mobile-card-header {
+    @apply flex-col;
+  }
+
+  .arriendos-mobile-info-grid {
+    @apply grid-cols-1;
+  }
+
+  .arriendos-mobile-actions {
+    @apply flex-col items-stretch;
+  }
+
+  .arriendos-mobile-actions a {
+    @apply w-full;
+  }
+}
+
+/* ---------------------------------------------------------
+   03.6 PÁGINA CREAR ARRIENDO
+   Archivo: app/pages/arriendos/crear.vue
+--------------------------------------------------------- */
+
+.arriendo-create-page {
+  @apply w-full max-w-7xl mx-auto text-slate-900;
+}
+
+.arriendo-create-header {
+  @apply flex items-start justify-between gap-6 mb-6;
+}
+
+.arriendo-create-title {
+  @apply m-0 text-slate-900 text-3xl font-extrabold;
+}
+
+.arriendo-create-description {
+  @apply mt-2 mb-0 text-slate-600 leading-relaxed;
+}
+
+.arriendo-create-header-actions {
+  @apply flex items-center gap-3;
+}
+
+.arriendo-create-layout {
+  @apply grid grid-cols-[minmax(0,1fr)_360px] gap-5 items-start;
+}
+
+.arriendo-create-form-card,
+.arriendo-create-summary-card {
+  @apply border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.arriendo-create-summary-card {
+  @apply sticky top-4;
+}
+
+.arriendo-create-card-header {
+  @apply p-5 border-b border-gray-200;
+}
+
+.arriendo-create-card-title {
+  @apply m-0 text-slate-900 text-lg font-extrabold;
+}
+
+.arriendo-create-card-description {
+  @apply mt-2 mb-0 text-slate-500 text-sm leading-relaxed;
+}
+
+.arriendo-create-form {
+  @apply grid grid-cols-2 gap-4 p-5;
+}
+
+.arriendo-create-field {
+  @apply flex flex-col gap-2;
+}
+
+.arriendo-create-label {
+  @apply text-slate-700 text-sm font-bold;
+}
+
+.arriendo-create-input,
+.arriendo-create-select {
+  @apply w-full min-h-11 px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-900;
+}
+
+.arriendo-create-input:focus,
+.arriendo-create-select:focus {
+  @apply outline-none border-blue-600 ring-4 ring-blue-600/15;
+}
+
+.arriendo-create-help {
+  @apply m-0 text-slate-500 text-xs leading-snug;
+}
+
+.arriendo-create-form-actions {
+  @apply flex justify-end gap-3 p-5 border-t border-gray-200;
+}
+
+.arriendo-create-primary-button,
+.arriendo-create-secondary-link {
+  @apply inline-flex items-center justify-center min-h-10 px-4 py-3 border border-transparent rounded-xl text-sm font-extrabold no-underline cursor-pointer whitespace-nowrap;
+}
+
+.arriendo-create-primary-button {
+  @apply bg-blue-600 text-white;
+}
+
+.arriendo-create-primary-button:hover {
+  @apply bg-blue-700;
+}
+
+.arriendo-create-secondary-link {
+  @apply border-slate-300 bg-white text-slate-700;
+}
+
+.arriendo-create-secondary-link:hover {
+  @apply bg-slate-50;
+}
+
+.arriendo-create-summary-list {
+  @apply flex flex-col gap-3 p-5;
+}
+
+.arriendo-create-summary-item {
+  @apply p-4 border border-gray-200 rounded-xl bg-slate-50;
+}
+
+.arriendo-create-summary-label {
+  @apply block mb-1 text-slate-500 text-xs font-bold;
+}
+
+.arriendo-create-summary-value {
+  @apply text-slate-900 text-sm font-extrabold;
+}
+
+.arriendo-create-summary-total {
+  @apply p-4 rounded-xl bg-blue-900 text-white;
+}
+
+.arriendo-create-summary-total-label {
+  @apply block mb-2 text-blue-100 text-sm font-bold;
+}
+
+.arriendo-create-summary-total-value {
+  @apply text-white text-3xl font-black;
+}
+
+.arriendo-create-warning-box {
+  @apply mx-5 mb-5 p-4 border border-yellow-400 rounded-xl bg-yellow-50;
+}
+
+.arriendo-create-warning-title {
+  @apply m-0 text-yellow-800 text-sm font-extrabold;
+}
+
+.arriendo-create-warning-text {
+  @apply mt-2 mb-0 text-yellow-800 text-sm leading-relaxed;
+}
+
+@media (max-width: 1024px) {
+  .arriendo-create-header {
+    @apply flex-col items-stretch;
+  }
+
+  .arriendo-create-header-actions {
+    @apply w-full;
+  }
+
+  .arriendo-create-secondary-link {
+    @apply w-full;
+  }
+
+  .arriendo-create-layout {
+    @apply grid-cols-1;
+  }
+
+  .arriendo-create-summary-card {
+    @apply static;
+  }
+}
+
+@media (max-width: 768px) {
+  .arriendo-create-form {
+    @apply grid-cols-1;
+  }
+
+  .arriendo-create-form-actions {
+    @apply flex-col-reverse;
+  }
+
+  .arriendo-create-form-actions .arriendo-create-primary-button,
+  .arriendo-create-form-actions .arriendo-create-secondary-link {
+    @apply w-full;
+  }
+}
+
+@media (max-width: 480px) {
+  .arriendo-create-title {
+    @apply text-2xl;
+  }
+
+  .arriendo-create-card-header,
+  .arriendo-create-form,
+  .arriendo-create-form-actions,
+  .arriendo-create-summary-list {
+    @apply p-4;
+  }
+
+  .arriendo-create-warning-box {
+    @apply mx-4 mb-4;
+  }
+}
+
+/* ---------------------------------------------------------
+   03.7 PÁGINA DETALLE ARRIENDO
+   Archivo: app/pages/arriendos/[id]/index.vue
+--------------------------------------------------------- */
+
+.arriendo-detail-page {
+  @apply w-full max-w-7xl mx-auto text-slate-900;
+}
+
+.arriendo-detail-header {
+  @apply flex items-start justify-between gap-6 mb-6;
+}
+
+.arriendo-detail-title {
+  @apply m-0 text-slate-900 text-3xl font-extrabold;
+}
+
+.arriendo-detail-description {
+  @apply mt-2 mb-0 text-slate-600 leading-relaxed;
+}
+
+.arriendo-detail-header-actions {
+  @apply flex items-center gap-3;
+}
+
+.arriendo-detail-secondary-link,
+.arriendo-detail-warning-link {
+  @apply inline-flex items-center justify-center min-h-10 px-4 py-3 border border-transparent rounded-xl text-sm font-extrabold no-underline whitespace-nowrap;
+}
+
+.arriendo-detail-secondary-link {
+  @apply border-slate-300 bg-white text-slate-700;
+}
+
+.arriendo-detail-secondary-link:hover {
+  @apply bg-slate-50;
+}
+
+.arriendo-detail-warning-link {
+  @apply bg-yellow-500 text-gray-900;
+}
+
+.arriendo-detail-warning-link:hover {
+  @apply bg-yellow-600;
+}
+
+.arriendo-detail-status-card {
+  @apply flex items-center justify-between gap-4 p-5 mb-5 border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.arriendo-detail-status-label {
+  @apply block mb-1 text-slate-500 text-xs font-bold;
+}
+
+.arriendo-detail-status-title {
+  @apply block text-slate-900 text-lg font-black;
+}
+
+.arriendo-detail-status-text {
+  @apply mt-1 mb-0 text-slate-500 leading-relaxed;
+}
+
+.arriendo-detail-status-badge {
+  @apply inline-flex items-center justify-center min-h-8 px-4 py-1 rounded-full text-sm font-extrabold whitespace-nowrap;
+}
+
+.arriendo-detail-status-vigente {
+  @apply bg-green-100 text-green-800;
+}
+
+.arriendo-detail-status-finalizado {
+  @apply bg-red-100 text-red-800;
+}
+
+.arriendo-detail-layout {
+  @apply grid grid-cols-[minmax(0,1fr)_360px] gap-5 items-start;
+}
+
+.arriendo-detail-main {
+  @apply flex flex-col gap-5;
+}
+
+.arriendo-detail-sidebar {
+  @apply flex flex-col gap-5 sticky top-4;
+}
+
+.arriendo-detail-card,
+.arriendo-detail-summary-card {
+  @apply overflow-hidden border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.arriendo-detail-card-header {
+  @apply p-5 border-b border-gray-200;
+}
+
+.arriendo-detail-card-title {
+  @apply m-0 text-slate-900 text-lg font-extrabold;
+}
+
+.arriendo-detail-card-description {
+  @apply mt-2 mb-0 text-slate-500 text-sm leading-relaxed;
+}
+
+.arriendo-detail-info-grid {
+  @apply grid grid-cols-2 gap-4 p-5;
+}
+
+.arriendo-detail-info-item {
+  @apply p-4 border border-gray-200 rounded-xl bg-slate-50;
+}
+
+.arriendo-detail-info-label {
+  @apply block mb-1 text-slate-500 text-xs font-bold;
+}
+
+.arriendo-detail-info-value {
+  @apply text-slate-900 text-sm font-extrabold;
+}
+
+.arriendo-detail-vehicle {
+  @apply grid grid-cols-[260px_minmax(0,1fr)] gap-4 p-5;
+}
+
+.arriendo-detail-vehicle .arriendo-detail-info-grid {
+  @apply p-0;
+}
+
+.arriendo-detail-vehicle-image {
+  @apply min-h-56 flex items-center justify-center border border-gray-200 rounded-xl bg-slate-50 text-slate-500;
+}
+
+.arriendo-detail-vehicle-image-text {
+  @apply text-sm font-bold;
+}
+
+.arriendo-detail-evidence-grid {
+  @apply grid grid-cols-2 gap-5 p-5;
+}
+
+.arriendo-detail-evidence-section {
+  @apply flex flex-col gap-3;
+}
+
+.arriendo-detail-evidence-title {
+  @apply m-0 text-slate-900 text-base font-extrabold;
+}
+
+.arriendo-detail-photo-grid {
+  @apply grid grid-cols-2 gap-3;
+}
+
+.arriendo-detail-photo-box,
+.arriendo-detail-photo-empty {
+  @apply min-h-32 flex items-center justify-center p-4 border border-dashed border-slate-300 rounded-xl bg-slate-50 text-slate-500 text-center;
+}
+
+.arriendo-detail-photo-text {
+  @apply text-sm font-bold;
+}
+
+.arriendo-detail-summary-list {
+  @apply flex flex-col gap-3 p-5;
+}
+
+.arriendo-detail-summary-item {
+  @apply p-4 border border-gray-200 rounded-xl bg-slate-50;
+}
+
+.arriendo-detail-summary-label {
+  @apply block mb-1 text-slate-500 text-xs font-bold;
+}
+
+.arriendo-detail-summary-value {
+  @apply text-slate-900 text-sm font-extrabold;
+}
+
+.arriendo-detail-summary-total {
+  @apply p-4 rounded-xl bg-blue-900 text-white;
+}
+
+.arriendo-detail-summary-total-label {
+  @apply block mb-2 text-blue-100 text-sm font-bold;
+}
+
+.arriendo-detail-summary-total-value {
+  @apply text-white text-3xl font-black;
+}
+
+@media (max-width: 1024px) {
+  .arriendo-detail-header {
+    @apply flex-col items-stretch;
+  }
+
+  .arriendo-detail-header-actions {
+    @apply w-full;
+  }
+
+  .arriendo-detail-secondary-link,
+  .arriendo-detail-warning-link {
+    @apply w-full;
+  }
+
+  .arriendo-detail-layout {
+    @apply grid-cols-1;
+  }
+
+  .arriendo-detail-sidebar {
+    @apply static;
+  }
+
+  .arriendo-detail-vehicle {
+    @apply grid-cols-1;
+  }
+}
+
+@media (max-width: 768px) {
+  .arriendo-detail-header-actions {
+    @apply flex-col;
+  }
+
+  .arriendo-detail-status-card {
+    @apply flex-col items-start;
+  }
+
+  .arriendo-detail-info-grid,
+  .arriendo-detail-evidence-grid {
+    @apply grid-cols-1;
+  }
+
+  .arriendo-detail-photo-grid {
+    @apply grid-cols-1;
+  }
+}
+
+@media (max-width: 480px) {
+  .arriendo-detail-title {
+    @apply text-2xl;
+  }
+
+  .arriendo-detail-card-header,
+  .arriendo-detail-info-grid,
+  .arriendo-detail-vehicle,
+  .arriendo-detail-evidence-grid,
+  .arriendo-detail-summary-list {
+    @apply p-4;
+  }
+}
+
+/* ---------------------------------------------------------
+   03.8 PÁGINA DEVOLUCIÓN ARRIENDO
+   Archivo: app/pages/arriendos/[id]/devolucion.vue
+--------------------------------------------------------- */
+
+.arriendo-devolucion-page {
+  @apply w-full max-w-7xl mx-auto text-slate-900;
+}
+
+.arriendo-devolucion-header {
+  @apply flex items-start justify-between gap-6 mb-6;
+}
+
+.arriendo-devolucion-title {
+  @apply m-0 text-slate-900 text-3xl font-extrabold;
+}
+
+.arriendo-devolucion-description {
+  @apply mt-2 mb-0 text-slate-600 leading-relaxed;
+}
+
+.arriendo-devolucion-header-actions {
+  @apply flex items-center gap-3;
+}
+
+.arriendo-devolucion-primary-button,
+.arriendo-devolucion-secondary-link,
+.arriendo-devolucion-secondary-button,
+.arriendo-devolucion-danger-button {
+  @apply inline-flex items-center justify-center min-h-10 px-4 py-3 border border-transparent rounded-xl text-sm font-extrabold no-underline cursor-pointer whitespace-nowrap;
+}
+
+.arriendo-devolucion-primary-button {
+  @apply bg-blue-600 text-white;
+}
+
+.arriendo-devolucion-primary-button:hover {
+  @apply bg-blue-700;
+}
+
+.arriendo-devolucion-secondary-link,
+.arriendo-devolucion-secondary-button {
+  @apply border-slate-300 bg-white text-slate-700;
+}
+
+.arriendo-devolucion-secondary-link:hover,
+.arriendo-devolucion-secondary-button:hover {
+  @apply bg-slate-50;
+}
+
+.arriendo-devolucion-danger-button {
+  @apply bg-red-600 text-white;
+}
+
+.arriendo-devolucion-danger-button:hover {
+  @apply bg-red-700;
+}
+
+.arriendo-devolucion-alert {
+  @apply p-5 mb-5 border border-yellow-400 rounded-2xl bg-yellow-50;
+}
+
+.arriendo-devolucion-alert-title {
+  @apply m-0 text-yellow-800 text-base font-extrabold;
+}
+
+.arriendo-devolucion-alert-text {
+  @apply mt-2 mb-0 text-yellow-800 leading-relaxed;
+}
+
+.arriendo-devolucion-layout {
+  @apply grid grid-cols-[minmax(0,1fr)_360px] gap-5 items-start;
+}
+
+.arriendo-devolucion-form-card,
+.arriendo-devolucion-summary-card {
+  @apply overflow-hidden border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.arriendo-devolucion-summary-card {
+  @apply sticky top-4;
+}
+
+.arriendo-devolucion-card-header {
+  @apply p-5 border-b border-gray-200;
+}
+
+.arriendo-devolucion-card-title {
+  @apply m-0 text-slate-900 text-lg font-extrabold;
+}
+
+.arriendo-devolucion-card-description {
+  @apply mt-2 mb-0 text-slate-500 text-sm leading-relaxed;
+}
+
+.arriendo-devolucion-form {
+  @apply grid grid-cols-2 gap-4 p-5;
+}
+
+.arriendo-devolucion-field {
+  @apply flex flex-col gap-2;
+}
+
+.arriendo-devolucion-field-full {
+  @apply col-span-full;
+}
+
+.arriendo-devolucion-label {
+  @apply text-slate-700 text-sm font-bold;
+}
+
+.arriendo-devolucion-input,
+.arriendo-devolucion-select {
+  @apply w-full min-h-11 px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-900;
+}
+
+.arriendo-devolucion-input:focus,
+.arriendo-devolucion-select:focus {
+  @apply outline-none border-blue-600 ring-4 ring-blue-600/15;
+}
+
+.arriendo-devolucion-help {
+  @apply m-0 text-slate-500 text-xs leading-snug;
+}
+
+.arriendo-devolucion-note {
+  @apply p-4 border border-blue-100 rounded-xl bg-blue-50;
+}
+
+.arriendo-devolucion-note-title {
+  @apply m-0 text-blue-800 text-sm font-extrabold;
+}
+
+.arriendo-devolucion-note-text {
+  @apply mt-2 mb-0 text-blue-900 text-sm leading-relaxed;
+}
+
+.arriendo-devolucion-form-actions {
+  @apply flex justify-end gap-3 p-5 border-t border-gray-200;
+}
+
+.arriendo-devolucion-summary-list {
+  @apply flex flex-col gap-3 p-5;
+}
+
+.arriendo-devolucion-summary-item {
+  @apply p-4 border border-gray-200 rounded-xl bg-slate-50;
+}
+
+.arriendo-devolucion-summary-label {
+  @apply block mb-1 text-slate-500 text-xs font-bold;
+}
+
+.arriendo-devolucion-summary-value {
+  @apply text-slate-900 text-sm font-extrabold;
+}
+
+.arriendo-devolucion-summary-status {
+  @apply p-4 rounded-xl bg-green-100;
+}
+
+.arriendo-devolucion-summary-status-label {
+  @apply block mb-2 text-green-800 text-sm font-bold;
+}
+
+.arriendo-devolucion-summary-status-value {
+  @apply text-green-800 text-xl font-black;
+}
+
+.arriendo-devolucion-confirm-backdrop {
+  @apply fixed inset-0 z-200 flex items-center justify-center p-4 bg-slate-900/60;
+}
+
+.arriendo-devolucion-confirm-modal {
+  @apply w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl;
+}
+
+.arriendo-devolucion-confirm-header {
+  @apply p-5 border-b border-gray-200;
+}
+
+.arriendo-devolucion-confirm-title {
+  @apply m-0 text-slate-900 text-xl font-extrabold;
+}
+
+.arriendo-devolucion-confirm-body {
+  @apply p-5;
+}
+
+.arriendo-devolucion-confirm-text {
+  @apply m-0 text-slate-600 leading-relaxed;
+}
+
+.arriendo-devolucion-confirm-warning {
+  @apply mt-4 mb-0 p-4 border border-red-200 rounded-xl bg-red-50 text-red-800 text-sm leading-relaxed;
+}
+
+.arriendo-devolucion-confirm-actions {
+  @apply flex justify-end gap-3 p-5 border-t border-gray-200;
+}
+
+@media (max-width: 1024px) {
+  .arriendo-devolucion-header {
+    @apply flex-col items-stretch;
+  }
+
+  .arriendo-devolucion-header-actions {
+    @apply w-full;
+  }
+
+  .arriendo-devolucion-secondary-link {
+    @apply w-full;
+  }
+
+  .arriendo-devolucion-layout {
+    @apply grid-cols-1;
+  }
+
+  .arriendo-devolucion-summary-card {
+    @apply static;
+  }
+}
+
+@media (max-width: 768px) {
+  .arriendo-devolucion-form {
+    @apply grid-cols-1;
+  }
+
+  .arriendo-devolucion-form-actions,
+  .arriendo-devolucion-confirm-actions {
+    @apply flex-col-reverse;
+  }
+
+  .arriendo-devolucion-form-actions .arriendo-devolucion-primary-button,
+  .arriendo-devolucion-form-actions .arriendo-devolucion-secondary-link,
+  .arriendo-devolucion-confirm-actions .arriendo-devolucion-secondary-button,
+  .arriendo-devolucion-confirm-actions .arriendo-devolucion-danger-button {
+    @apply w-full;
+  }
+}
+
+@media (max-width: 480px) {
+  .arriendo-devolucion-title {
+    @apply text-2xl;
+  }
+
+  .arriendo-devolucion-card-header,
+  .arriendo-devolucion-form,
+  .arriendo-devolucion-form-actions,
+  .arriendo-devolucion-summary-list,
+  .arriendo-devolucion-confirm-header,
+  .arriendo-devolucion-confirm-body,
+  .arriendo-devolucion-confirm-actions {
+    @apply p-4;
+  }
+}
+
+/* ---------------------------------------------------------
+   03.9 PÁGINA CLIENTES
+   Archivo: app/pages/clientes/index.vue
+--------------------------------------------------------- */
+
+.clientes-page {
+  @apply w-full max-w-7xl mx-auto text-slate-900;
+}
+
+.clientes-header {
+  @apply flex items-start justify-between gap-6 mb-6;
+}
+
+.clientes-title {
+  @apply m-0 text-slate-900 text-3xl font-extrabold;
+}
+
+.clientes-description {
+  @apply mt-2 mb-0 text-slate-600 leading-relaxed;
+}
+
+.clientes-header-actions {
+  @apply flex items-center gap-3;
+}
+
+.clientes-summary-grid {
+  @apply grid grid-cols-3 gap-4 my-8;
+}
+
+.clientes-summary-card {
+  @apply p-5 border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.clientes-summary-label {
+  @apply block mb-3 text-slate-600 text-sm;
+}
+
+.clientes-summary-value {
+  @apply block text-slate-900 text-3xl font-black leading-none;
+}
+
+.clientes-summary-text {
+  @apply mt-3 mb-0 text-slate-500 text-sm;
+}
+
+.clientes-filters-card {
+  @apply p-5 mb-6 border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.clientes-filters-grid {
+  @apply grid grid-cols-[1fr_240px] gap-4;
+}
+
+.clientes-field {
+  @apply flex flex-col gap-2;
+}
+
+.clientes-field-full {
+  @apply col-span-full;
+}
+
+.clientes-label {
+  @apply text-slate-700 text-sm font-bold;
+}
+
+.clientes-input,
+.clientes-select {
+  @apply w-full min-h-11 px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-900;
+}
+
+.clientes-input:focus,
+.clientes-select:focus {
+  @apply outline-none border-blue-600 ring-4 ring-blue-600/15;
+}
+
+.clientes-primary-button,
+.clientes-secondary-button,
+.clientes-danger-button,
+.clientes-secondary-link {
+  @apply inline-flex items-center justify-center min-h-10 px-4 py-3 border border-transparent rounded-xl text-sm font-extrabold no-underline cursor-pointer whitespace-nowrap;
+}
+
+.clientes-primary-button {
+  @apply bg-blue-600 text-white;
+}
+
+.clientes-primary-button:hover {
+  @apply bg-blue-700;
+}
+
+.clientes-secondary-button,
+.clientes-secondary-link {
+  @apply border-slate-300 bg-white text-slate-700;
+}
+
+.clientes-secondary-button:hover,
+.clientes-secondary-link:hover {
+  @apply bg-slate-50;
+}
+
+.clientes-danger-button {
+  @apply bg-red-600 text-white;
+}
+
+.clientes-danger-button:hover {
+  @apply bg-red-700;
+}
+
+.clientes-table-card {
+  @apply overflow-hidden border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.clientes-table-wrapper {
+  @apply w-full overflow-x-auto;
+}
+
+.clientes-table {
+  @apply w-full border-collapse;
+}
+
+.clientes-table th,
+.clientes-table td {
+  @apply px-4 py-3 border-b border-gray-200 text-left align-middle;
+}
+
+.clientes-table th {
+  @apply bg-slate-50 text-slate-700 text-xs font-extrabold uppercase tracking-wide;
+}
+
+.clientes-table td {
+  @apply text-slate-900 text-sm;
+}
+
+.clientes-table tr:last-child td {
+  @apply border-b-0;
+}
+
+.clientes-table-actions {
+  @apply flex items-center gap-2;
+}
+
+.clientes-status {
+  @apply inline-flex items-center justify-center min-h-7 px-3 py-1 rounded-full text-xs font-extrabold whitespace-nowrap;
+}
+
+.clientes-status-activo {
+  @apply bg-green-100 text-green-800;
+}
+
+.clientes-status-inactivo {
+  @apply bg-red-100 text-red-800;
+}
+
+.clientes-mobile-list {
+  @apply hidden;
+}
+
+.clientes-mobile-card {
+  @apply p-4 border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.clientes-mobile-card-header {
+  @apply flex items-start justify-between gap-3 mb-4;
+}
+
+.clientes-mobile-card-title {
+  @apply m-0 text-slate-900 text-lg font-extrabold;
+}
+
+.clientes-mobile-card-subtitle {
+  @apply mt-1 mb-0 text-slate-500 text-sm;
+}
+
+.clientes-mobile-info-grid {
+  @apply grid grid-cols-1 gap-3;
+}
+
+.clientes-mobile-info-item {
+  @apply p-3 border border-gray-200 rounded-xl bg-slate-50;
+}
+
+.clientes-mobile-info-label {
+  @apply block mb-1 text-slate-500 text-xs font-bold;
+}
+
+.clientes-mobile-info-value {
+  @apply text-slate-900 text-sm font-extrabold;
+}
+
+.clientes-mobile-actions {
+  @apply flex items-center gap-2 flex-wrap mt-4;
+}
+
+.clientes-empty {
+  @apply p-8 mt-4 border border-dashed border-slate-300 rounded-2xl bg-white text-center;
+}
+
+.clientes-empty-title {
+  @apply m-0 text-slate-900 text-xl font-extrabold;
+}
+
+.clientes-empty-text {
+  @apply mt-2 mb-0 text-slate-500;
+}
+
+.clientes-modal-backdrop,
+.clientes-confirm-backdrop {
+  @apply fixed inset-0 z-200 flex items-center justify-center p-4 bg-slate-900/60;
+}
+
+.clientes-modal {
+  @apply w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-2xl;
+}
+
+.clientes-modal-header,
+.clientes-confirm-header {
+  @apply flex items-center justify-between gap-4 p-5 border-b border-gray-200;
+}
+
+.clientes-modal-title,
+.clientes-confirm-title {
+  @apply m-0 text-slate-900 text-xl font-extrabold;
+}
+
+.clientes-modal-close {
+  @apply w-9 h-9 border-0 rounded-lg bg-slate-100 text-slate-700 text-2xl cursor-pointer;
+}
+
+.clientes-form {
+  @apply grid grid-cols-2 gap-4 p-5;
+}
+
+.clientes-modal-actions,
+.clientes-confirm-actions {
+  @apply flex justify-end gap-3 p-5 border-t border-gray-200;
+}
+
+.clientes-confirm-modal {
+  @apply w-full max-w-md rounded-2xl bg-white shadow-2xl;
+}
+
+.clientes-confirm-text {
+  @apply m-0 p-5 text-slate-600 leading-relaxed;
+}
+
+@media (max-width: 1024px) {
+  .clientes-header {
+    @apply flex-col items-stretch;
+  }
+
+  .clientes-header-actions {
+    @apply w-full;
+  }
+
+  .clientes-primary-button {
+    @apply w-full;
+  }
+
+  .clientes-summary-grid {
+    @apply grid-cols-2;
+  }
+
+  .clientes-filters-grid {
+    @apply grid-cols-1;
+  }
+
+  .clientes-form {
+    @apply grid-cols-1;
+  }
+}
+
+@media (max-width: 768px) {
+  .clientes-table-card {
+    @apply hidden;
+  }
+
+  .clientes-mobile-list {
+    @apply grid gap-4;
+  }
+}
+
+@media (max-width: 640px) {
+  .clientes-summary-grid {
+    @apply grid-cols-1;
+  }
+
+  .clientes-mobile-card-header {
+    @apply flex-col;
+  }
+
+  .clientes-mobile-actions {
+    @apply flex-col items-stretch;
+  }
+
+  .clientes-mobile-actions a,
+  .clientes-mobile-actions button,
+  .clientes-modal-actions button,
+  .clientes-confirm-actions button {
+    @apply w-full;
+  }
+
+  .clientes-modal-actions,
+  .clientes-confirm-actions {
+    @apply flex-col-reverse;
+  }
+}
+
+/* ---------------------------------------------------------
+   03.10 PÁGINA DETALLE CLIENTE
+   Archivo: app/pages/clientes/[id].vue
+--------------------------------------------------------- */
+
+.cliente-detail-page {
+  @apply w-full max-w-7xl mx-auto text-slate-900;
+}
+
+.cliente-detail-header {
+  @apply flex items-start justify-between gap-6 mb-6;
+}
+
+.cliente-detail-title {
+  @apply m-0 text-slate-900 text-3xl font-extrabold;
+}
+
+.cliente-detail-description {
+  @apply mt-2 mb-0 text-slate-600 leading-relaxed;
+}
+
+.cliente-detail-header-actions {
+  @apply flex items-center gap-3 flex-wrap;
+}
+
+.cliente-detail-primary-button,
+.cliente-detail-secondary-button,
+.cliente-detail-danger-button,
+.cliente-detail-secondary-link,
+.cliente-detail-small-link {
+  @apply inline-flex items-center justify-center min-h-10 px-4 py-3 border border-transparent rounded-xl text-sm font-extrabold no-underline cursor-pointer whitespace-nowrap;
+}
+
+.cliente-detail-primary-button {
+  @apply bg-blue-600 text-white;
+}
+
+.cliente-detail-primary-button:hover {
+  @apply bg-blue-700;
+}
+
+.cliente-detail-secondary-button,
+.cliente-detail-secondary-link {
+  @apply border-slate-300 bg-white text-slate-700;
+}
+
+.cliente-detail-secondary-button:hover,
+.cliente-detail-secondary-link:hover {
+  @apply bg-slate-50;
+}
+
+.cliente-detail-danger-button {
+  @apply bg-red-600 text-white;
+}
+
+.cliente-detail-danger-button:hover {
+  @apply bg-red-700;
+}
+
+.cliente-detail-small-link {
+  @apply min-h-9 px-3 py-2 border-slate-300 bg-white text-slate-700 text-xs;
+}
+
+.cliente-detail-small-link:hover {
+  @apply bg-slate-50;
+}
+
+.cliente-detail-status-card {
+  @apply flex items-center justify-between gap-4 p-5 mb-5 border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.cliente-detail-status-label {
+  @apply block mb-1 text-slate-500 text-xs font-bold;
+}
+
+.cliente-detail-status-title {
+  @apply block text-slate-900 text-lg font-black;
+}
+
+.cliente-detail-status-text {
+  @apply mt-1 mb-0 text-slate-500 leading-relaxed;
+}
+
+.cliente-detail-status-badge {
+  @apply inline-flex items-center justify-center min-h-8 px-4 py-1 rounded-full text-sm font-extrabold whitespace-nowrap;
+}
+
+.cliente-detail-status-activo {
+  @apply bg-green-100 text-green-800;
+}
+
+.cliente-detail-status-inactivo {
+  @apply bg-red-100 text-red-800;
+}
+
+.cliente-detail-layout {
+  @apply grid grid-cols-[minmax(0,1fr)_360px] gap-5 items-start;
+}
+
+.cliente-detail-main {
+  @apply flex flex-col gap-5;
+}
+
+.cliente-detail-sidebar {
+  @apply flex flex-col gap-5 sticky top-4;
+}
+
+.cliente-detail-card,
+.cliente-detail-summary-card {
+  @apply overflow-hidden border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.cliente-detail-card-header {
+  @apply p-5 border-b border-gray-200;
+}
+
+.cliente-detail-card-title {
+  @apply m-0 text-slate-900 text-lg font-extrabold;
+}
+
+.cliente-detail-card-description {
+  @apply mt-2 mb-0 text-slate-500 text-sm leading-relaxed;
+}
+
+.cliente-detail-info-grid {
+  @apply grid grid-cols-2 gap-4 p-5;
+}
+
+.cliente-detail-info-item {
+  @apply p-4 border border-gray-200 rounded-xl bg-slate-50;
+}
+
+.cliente-detail-info-full {
+  @apply col-span-full;
+}
+
+.cliente-detail-info-label {
+  @apply block mb-1 text-slate-500 text-xs font-bold;
+}
+
+.cliente-detail-info-value {
+  @apply text-slate-900 text-sm font-extrabold;
+}
+
+.cliente-detail-table-wrapper {
+  @apply w-full overflow-x-auto;
+}
+
+.cliente-detail-table {
+  @apply w-full border-collapse;
+}
+
+.cliente-detail-table th,
+.cliente-detail-table td {
+  @apply px-4 py-3 border-b border-gray-200 text-left align-middle;
+}
+
+.cliente-detail-table th {
+  @apply bg-slate-50 text-slate-700 text-xs font-extrabold uppercase tracking-wide;
+}
+
+.cliente-detail-table td {
+  @apply text-slate-900 text-sm;
+}
+
+.cliente-detail-table tr:last-child td {
+  @apply border-b-0;
+}
+
+.cliente-detail-rental-status {
+  @apply inline-flex items-center justify-center min-h-7 px-3 py-1 rounded-full text-xs font-extrabold whitespace-nowrap;
+}
+
+.cliente-detail-rental-vigente {
+  @apply bg-green-100 text-green-800;
+}
+
+.cliente-detail-rental-finalizado {
+  @apply bg-red-100 text-red-800;
+}
+
+.cliente-detail-mobile-rentals {
+  @apply hidden;
+}
+
+.cliente-detail-mobile-rental-card {
+  @apply m-4 p-4 border border-gray-300 rounded-2xl bg-white;
+}
+
+.cliente-detail-mobile-rental-header {
+  @apply flex items-start justify-between gap-3 mb-4;
+}
+
+.cliente-detail-mobile-rental-title {
+  @apply m-0 text-slate-900 text-base font-extrabold;
+}
+
+.cliente-detail-mobile-rental-subtitle {
+  @apply mt-1 mb-0 text-slate-500 text-sm;
+}
+
+.cliente-detail-mobile-rental-info {
+  @apply p-4 border border-gray-200 rounded-xl bg-slate-50;
+}
+
+.cliente-detail-mobile-rental-label {
+  @apply block mb-1 text-slate-500 text-xs font-bold;
+}
+
+.cliente-detail-mobile-rental-value {
+  @apply text-slate-900 text-sm font-extrabold;
+}
+
+.cliente-detail-mobile-rental-actions {
+  @apply mt-4;
+}
+
+.cliente-detail-empty-rentals {
+  @apply p-8 text-center;
+}
+
+.cliente-detail-empty-title {
+  @apply m-0 text-slate-900 text-lg font-extrabold;
+}
+
+.cliente-detail-empty-text {
+  @apply mt-2 mb-0 text-slate-500;
+}
+
+.cliente-detail-summary-list {
+  @apply flex flex-col gap-3 p-5;
+}
+
+.cliente-detail-summary-item {
+  @apply p-4 border border-gray-200 rounded-xl bg-slate-50;
+}
+
+.cliente-detail-summary-label {
+  @apply block mb-1 text-slate-500 text-xs font-bold;
+}
+
+.cliente-detail-summary-value {
+  @apply text-slate-900 text-sm font-extrabold;
+}
+
+.cliente-detail-summary-total {
+  @apply p-4 rounded-xl bg-blue-900 text-white;
+}
+
+.cliente-detail-summary-total-label {
+  @apply block mb-2 text-blue-100 text-sm font-bold;
+}
+
+.cliente-detail-summary-total-value {
+  @apply text-white text-3xl font-black;
+}
+
+.cliente-detail-modal-backdrop,
+.cliente-detail-confirm-backdrop {
+  @apply fixed inset-0 z-200 flex items-center justify-center p-4 bg-slate-900/60;
+}
+
+.cliente-detail-modal {
+  @apply w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-2xl;
+}
+
+.cliente-detail-modal-header,
+.cliente-detail-confirm-header {
+  @apply flex items-center justify-between gap-4 p-5 border-b border-gray-200;
+}
+
+.cliente-detail-modal-title,
+.cliente-detail-confirm-title {
+  @apply m-0 text-slate-900 text-xl font-extrabold;
+}
+
+.cliente-detail-modal-close {
+  @apply w-9 h-9 border-0 rounded-lg bg-slate-100 text-slate-700 text-2xl cursor-pointer;
+}
+
+.cliente-detail-form {
+  @apply grid grid-cols-2 gap-4 p-5;
+}
+
+.cliente-detail-field {
+  @apply flex flex-col gap-2;
+}
+
+.cliente-detail-field-full {
+  @apply col-span-full;
+}
+
+.cliente-detail-label {
+  @apply text-slate-700 text-sm font-bold;
+}
+
+.cliente-detail-input {
+  @apply w-full min-h-11 px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-900;
+}
+
+.cliente-detail-input:focus {
+  @apply outline-none border-blue-600 ring-4 ring-blue-600/15;
+}
+
+.cliente-detail-modal-actions,
+.cliente-detail-confirm-actions {
+  @apply flex justify-end gap-3 p-5 border-t border-gray-200;
+}
+
+.cliente-detail-confirm-modal {
+  @apply w-full max-w-md rounded-2xl bg-white shadow-2xl;
+}
+
+.cliente-detail-confirm-text {
+  @apply m-0 p-5 text-slate-600 leading-relaxed;
+}
+
+@media (max-width: 1024px) {
+  .cliente-detail-header {
+    @apply flex-col items-stretch;
+  }
+
+  .cliente-detail-header-actions {
+    @apply w-full;
+  }
+
+  .cliente-detail-primary-button,
+  .cliente-detail-danger-button,
+  .cliente-detail-secondary-link {
+    @apply w-full;
+  }
+
+  .cliente-detail-layout {
+    @apply grid-cols-1;
+  }
+
+  .cliente-detail-sidebar {
+    @apply static;
+  }
+
+  .cliente-detail-form {
+    @apply grid-cols-1;
+  }
+}
+
+@media (max-width: 768px) {
+  .cliente-detail-status-card {
+    @apply flex-col items-start;
+  }
+
+  .cliente-detail-info-grid {
+    @apply grid-cols-1;
+  }
+
+  .cliente-detail-table-wrapper {
+    @apply hidden;
+  }
+
+  .cliente-detail-mobile-rentals {
+    @apply block;
+  }
+
+  .cliente-detail-mobile-rental-header {
+    @apply flex-col;
+  }
+
+  .cliente-detail-modal-actions,
+  .cliente-detail-confirm-actions {
+    @apply flex-col-reverse;
+  }
+
+  .cliente-detail-modal-actions button,
+  .cliente-detail-confirm-actions button {
+    @apply w-full;
+  }
+}
+
+@media (max-width: 480px) {
+  .cliente-detail-title {
+    @apply text-2xl;
+  }
+
+  .cliente-detail-card-header,
+  .cliente-detail-info-grid,
+  .cliente-detail-summary-list,
+  .cliente-detail-form,
+  .cliente-detail-modal-actions,
+  .cliente-detail-confirm-actions {
+    @apply p-4;
+  }
+}
+
+/* ---------------------------------------------------------
+   03.11 PÁGINA TIPOS DE VEHÍCULO
+   Archivo: app/pages/admin/tipos/index.vue
+--------------------------------------------------------- */
+
+.tipos-page {
+  @apply w-full max-w-7xl mx-auto text-slate-900;
+}
+
+.tipos-header {
+  @apply flex items-start justify-between gap-6 mb-6;
+}
+
+.tipos-title {
+  @apply m-0 text-slate-900 text-3xl font-extrabold;
+}
+
+.tipos-description {
+  @apply mt-2 mb-0 text-slate-600 leading-relaxed;
+}
+
+.tipos-header-actions {
+  @apply flex items-center gap-3;
+}
+
+.tipos-summary-grid {
+  @apply grid grid-cols-3 gap-4 my-8;
+}
+
+.tipos-summary-card {
+  @apply p-5 border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.tipos-summary-label {
+  @apply block mb-3 text-slate-600 text-sm;
+}
+
+.tipos-summary-value {
+  @apply block text-slate-900 text-3xl font-black leading-none;
+}
+
+.tipos-summary-text {
+  @apply mt-3 mb-0 text-slate-500 text-sm;
+}
+
+.tipos-filters-card {
+  @apply p-5 mb-6 border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.tipos-filters-grid {
+  @apply grid grid-cols-[1fr_240px] gap-4;
+}
+
+.tipos-field {
+  @apply flex flex-col gap-2;
+}
+
+.tipos-field-full {
+  @apply col-span-full;
+}
+
+.tipos-label {
+  @apply text-slate-700 text-sm font-bold;
+}
+
+.tipos-input,
+.tipos-select,
+.tipos-textarea {
+  @apply w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-900;
+}
+
+.tipos-input,
+.tipos-select {
+  @apply min-h-11;
+}
+
+.tipos-textarea {
+  @apply min-h-28 resize-y;
+}
+
+.tipos-input:focus,
+.tipos-select:focus,
+.tipos-textarea:focus {
+  @apply outline-none border-blue-600 ring-4 ring-blue-600/15;
+}
+
+.tipos-primary-button,
+.tipos-secondary-button,
+.tipos-danger-button {
+  @apply inline-flex items-center justify-center min-h-10 px-4 py-3 border border-transparent rounded-xl text-sm font-extrabold no-underline cursor-pointer whitespace-nowrap;
+}
+
+.tipos-primary-button {
+  @apply bg-blue-600 text-white;
+}
+
+.tipos-primary-button:hover {
+  @apply bg-blue-700;
+}
+
+.tipos-secondary-button {
+  @apply border-slate-300 bg-white text-slate-700;
+}
+
+.tipos-secondary-button:hover {
+  @apply bg-slate-50;
+}
+
+.tipos-danger-button {
+  @apply bg-red-600 text-white;
+}
+
+.tipos-danger-button:hover {
+  @apply bg-red-700;
+}
+
+.tipos-grid {
+  @apply grid grid-cols-3 gap-4;
+}
+
+.tipos-card {
+  @apply p-5 border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.tipos-card-header {
+  @apply flex items-start justify-between gap-3 mb-4;
+}
+
+.tipos-card-title {
+  @apply m-0 text-slate-900 text-lg font-extrabold;
+}
+
+.tipos-card-description {
+  @apply mt-2 mb-0 text-slate-500 text-sm leading-relaxed;
+}
+
+.tipos-status {
+  @apply inline-flex items-center justify-center min-h-7 px-3 py-1 rounded-full text-xs font-extrabold whitespace-nowrap;
+}
+
+.tipos-status-activo {
+  @apply bg-green-100 text-green-800;
+}
+
+.tipos-status-inactivo {
+  @apply bg-red-100 text-red-800;
+}
+
+.tipos-info-list {
+  @apply grid grid-cols-1 gap-3;
+}
+
+.tipos-info-item {
+  @apply p-4 border border-gray-200 rounded-xl bg-slate-50;
+}
+
+.tipos-info-label {
+  @apply block mb-1 text-slate-500 text-xs font-bold;
+}
+
+.tipos-info-value {
+  @apply text-slate-900 text-base font-black;
+}
+
+.tipos-card-actions {
+  @apply flex items-center gap-2 flex-wrap mt-4;
+}
+
+.tipos-empty {
+  @apply p-8 mt-4 border border-dashed border-slate-300 rounded-2xl bg-white text-center;
+}
+
+.tipos-empty-title {
+  @apply m-0 text-slate-900 text-xl font-extrabold;
+}
+
+.tipos-empty-text {
+  @apply mt-2 mb-0 text-slate-500;
+}
+
+.tipos-modal-backdrop,
+.tipos-confirm-backdrop {
+  @apply fixed inset-0 z-200 flex items-center justify-center p-4 bg-slate-900/60;
+}
+
+.tipos-modal {
+  @apply w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-2xl;
+}
+
+.tipos-modal-header,
+.tipos-confirm-header {
+  @apply flex items-center justify-between gap-4 p-5 border-b border-gray-200;
+}
+
+.tipos-modal-title,
+.tipos-confirm-title {
+  @apply m-0 text-slate-900 text-xl font-extrabold;
+}
+
+.tipos-modal-close {
+  @apply w-9 h-9 border-0 rounded-lg bg-slate-100 text-slate-700 text-2xl cursor-pointer;
+}
+
+.tipos-form {
+  @apply grid grid-cols-2 gap-4 p-5;
+}
+
+.tipos-modal-actions,
+.tipos-confirm-actions {
+  @apply flex justify-end gap-3 p-5 border-t border-gray-200;
+}
+
+.tipos-confirm-modal {
+  @apply w-full max-w-md rounded-2xl bg-white shadow-2xl;
+}
+
+.tipos-confirm-text {
+  @apply m-0 p-5 text-slate-600 leading-relaxed;
+}
+
+@media (max-width: 1024px) {
+  .tipos-header {
+    @apply flex-col items-stretch;
+  }
+
+  .tipos-header-actions {
+    @apply w-full;
+  }
+
+  .tipos-primary-button {
+    @apply w-full;
+  }
+
+  .tipos-summary-grid {
+    @apply grid-cols-2;
+  }
+
+  .tipos-filters-grid {
+    @apply grid-cols-1;
+  }
+
+  .tipos-grid {
+    @apply grid-cols-2;
+  }
+
+  .tipos-form {
+    @apply grid-cols-1;
+  }
+}
+
+@media (max-width: 640px) {
+  .tipos-summary-grid,
+  .tipos-grid {
+    @apply grid-cols-1;
+  }
+
+  .tipos-card-header {
+    @apply flex-col;
+  }
+
+  .tipos-card-actions {
+    @apply flex-col items-stretch;
+  }
+
+  .tipos-card-actions button,
+  .tipos-modal-actions button,
+  .tipos-confirm-actions button {
+    @apply w-full;
+  }
+
+  .tipos-modal-actions,
+  .tipos-confirm-actions {
+    @apply flex-col-reverse;
+  }
+}
+
+/* ---------------------------------------------------------
+   03.12 PÁGINA USUARIOS
+   Archivo: app/pages/admin/usuarios/index.vue
+--------------------------------------------------------- */
+
+.usuarios-page {
+  @apply w-full max-w-7xl mx-auto text-slate-900;
+}
+
+.usuarios-header {
+  @apply flex items-start justify-between gap-6 mb-6;
+}
+
+.usuarios-title {
+  @apply m-0 text-slate-900 text-3xl font-extrabold;
+}
+
+.usuarios-description {
+  @apply mt-2 mb-0 text-slate-600 leading-relaxed;
+}
+
+.usuarios-header-actions {
+  @apply flex items-center gap-3;
+}
+
+.usuarios-summary-grid {
+  @apply grid grid-cols-4 gap-4 my-8;
+}
+
+.usuarios-summary-card {
+  @apply p-5 border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.usuarios-summary-label {
+  @apply block mb-3 text-slate-600 text-sm;
+}
+
+.usuarios-summary-value {
+  @apply block text-slate-900 text-3xl font-black leading-none;
+}
+
+.usuarios-summary-text {
+  @apply mt-3 mb-0 text-slate-500 text-sm;
+}
+
+.usuarios-filters-card {
+  @apply p-5 mb-6 border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.usuarios-filters-grid {
+  @apply grid grid-cols-[1fr_220px_220px] gap-4;
+}
+
+.usuarios-field {
+  @apply flex flex-col gap-2;
+}
+
+.usuarios-field-full {
+  @apply col-span-full;
+}
+
+.usuarios-label {
+  @apply text-slate-700 text-sm font-bold;
+}
+
+.usuarios-input,
+.usuarios-select {
+  @apply w-full min-h-11 px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-900;
+}
+
+.usuarios-input:focus,
+.usuarios-select:focus {
+  @apply outline-none border-blue-600 ring-4 ring-blue-600/15;
+}
+
+.usuarios-help {
+  @apply m-0 text-slate-500 text-xs leading-snug;
+}
+
+.usuarios-primary-button,
+.usuarios-secondary-button,
+.usuarios-danger-button {
+  @apply inline-flex items-center justify-center min-h-10 px-4 py-3 border border-transparent rounded-xl text-sm font-extrabold no-underline cursor-pointer whitespace-nowrap;
+}
+
+.usuarios-primary-button {
+  @apply bg-blue-600 text-white;
+}
+
+.usuarios-primary-button:hover {
+  @apply bg-blue-700;
+}
+
+.usuarios-secondary-button {
+  @apply border-slate-300 bg-white text-slate-700;
+}
+
+.usuarios-secondary-button:hover {
+  @apply bg-slate-50;
+}
+
+.usuarios-danger-button {
+  @apply bg-red-600 text-white;
+}
+
+.usuarios-danger-button:hover {
+  @apply bg-red-700;
+}
+
+.usuarios-table-card {
+  @apply overflow-hidden border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.usuarios-table-wrapper {
+  @apply w-full overflow-x-auto;
+}
+
+.usuarios-table {
+  @apply w-full border-collapse;
+}
+
+.usuarios-table th,
+.usuarios-table td {
+  @apply px-4 py-3 border-b border-gray-200 text-left align-middle;
+}
+
+.usuarios-table th {
+  @apply bg-slate-50 text-slate-700 text-xs font-extrabold uppercase tracking-wide;
+}
+
+.usuarios-table td {
+  @apply text-slate-900 text-sm;
+}
+
+.usuarios-table tr:last-child td {
+  @apply border-b-0;
+}
+
+.usuarios-table-actions {
+  @apply flex items-center gap-2;
+}
+
+.usuarios-status,
+.usuarios-profile {
+  @apply inline-flex items-center justify-center min-h-7 px-3 py-1 rounded-full text-xs font-extrabold whitespace-nowrap;
+}
+
+.usuarios-status-activo {
+  @apply bg-green-100 text-green-800;
+}
+
+.usuarios-status-inactivo {
+  @apply bg-red-100 text-red-800;
+}
+
+.usuarios-profile-admin {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.usuarios-profile-ejecutivo {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.usuarios-mobile-list {
+  @apply hidden;
+}
+
+.usuarios-mobile-card {
+  @apply p-4 border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.usuarios-mobile-card-header {
+  @apply flex items-start justify-between gap-3 mb-4;
+}
+
+.usuarios-mobile-card-title {
+  @apply m-0 text-slate-900 text-lg font-extrabold;
+}
+
+.usuarios-mobile-card-subtitle {
+  @apply mt-1 mb-0 text-slate-500 text-sm;
+}
+
+.usuarios-mobile-info-grid {
+  @apply grid grid-cols-1 gap-3;
+}
+
+.usuarios-mobile-info-item {
+  @apply p-3 border border-gray-200 rounded-xl bg-slate-50;
+}
+
+.usuarios-mobile-info-label {
+  @apply block mb-1 text-slate-500 text-xs font-bold;
+}
+
+.usuarios-mobile-info-value {
+  @apply text-slate-900 text-sm font-extrabold;
+}
+
+.usuarios-mobile-actions {
+  @apply flex items-center gap-2 flex-wrap mt-4;
+}
+
+.usuarios-empty {
+  @apply p-8 mt-4 border border-dashed border-slate-300 rounded-2xl bg-white text-center;
+}
+
+.usuarios-empty-title {
+  @apply m-0 text-slate-900 text-xl font-extrabold;
+}
+
+.usuarios-empty-text {
+  @apply mt-2 mb-0 text-slate-500;
+}
+
+.usuarios-modal-backdrop,
+.usuarios-confirm-backdrop {
+  @apply fixed inset-0 z-200 flex items-center justify-center p-4 bg-slate-900/60;
+}
+
+.usuarios-modal {
+  @apply w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-2xl;
+}
+
+.usuarios-modal-header,
+.usuarios-confirm-header {
+  @apply flex items-center justify-between gap-4 p-5 border-b border-gray-200;
+}
+
+.usuarios-modal-title,
+.usuarios-confirm-title {
+  @apply m-0 text-slate-900 text-xl font-extrabold;
+}
+
+.usuarios-modal-close {
+  @apply w-9 h-9 border-0 rounded-lg bg-slate-100 text-slate-700 text-2xl cursor-pointer;
+}
+
+.usuarios-form {
+  @apply grid grid-cols-2 gap-4 p-5;
+}
+
+.usuarios-modal-actions,
+.usuarios-confirm-actions {
+  @apply flex justify-end gap-3 p-5 border-t border-gray-200;
+}
+
+.usuarios-confirm-modal {
+  @apply w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl;
+}
+
+.usuarios-confirm-body {
+  @apply p-5;
+}
+
+.usuarios-confirm-text {
+  @apply m-0 text-slate-600 leading-relaxed;
+}
+
+.usuarios-confirm-warning {
+  @apply mt-4 mb-0 p-4 border border-red-200 rounded-xl bg-red-50 text-red-800 text-sm leading-relaxed;
+}
+
+@media (max-width: 1024px) {
+  .usuarios-header {
+    @apply flex-col items-stretch;
+  }
+
+  .usuarios-header-actions {
+    @apply w-full;
+  }
+
+  .usuarios-primary-button {
+    @apply w-full;
+  }
+
+  .usuarios-summary-grid {
+    @apply grid-cols-2;
+  }
+
+  .usuarios-filters-grid {
+    @apply grid-cols-1;
+  }
+
+  .usuarios-form {
+    @apply grid-cols-1;
+  }
+}
+
+@media (max-width: 768px) {
+  .usuarios-table-card {
+    @apply hidden;
+  }
+
+  .usuarios-mobile-list {
+    @apply grid gap-4;
+  }
+
+  .usuarios-mobile-card-header {
+    @apply flex-col;
+  }
+
+  .usuarios-mobile-actions {
+    @apply flex-col items-stretch;
+  }
+
+  .usuarios-mobile-actions button,
+  .usuarios-modal-actions button,
+  .usuarios-confirm-actions button {
+    @apply w-full;
+  }
+
+  .usuarios-modal-actions,
+  .usuarios-confirm-actions {
+    @apply flex-col-reverse;
+  }
+}
+
+@media (max-width: 640px) {
+  .usuarios-summary-grid {
+    @apply grid-cols-1;
+  }
+}
+
+/* ---------------------------------------------------------
+   03.13 PÁGINA CUENTA
+   Archivo: app/pages/cuenta/index.vue
+--------------------------------------------------------- */
+
+.cuenta-page {
+  @apply w-full max-w-7xl mx-auto text-slate-900;
+}
+
+.cuenta-header {
+  @apply flex items-start justify-between gap-6 mb-6;
+}
+
+.cuenta-title {
+  @apply m-0 text-slate-900 text-3xl font-extrabold;
+}
+
+.cuenta-description {
+  @apply mt-2 mb-0 text-slate-600 leading-relaxed;
+}
+
+.cuenta-layout {
+  @apply grid grid-cols-[minmax(0,1fr)_420px] gap-5 items-start;
+}
+
+.cuenta-profile-card,
+.cuenta-password-card,
+.cuenta-info-card {
+  @apply overflow-hidden border border-gray-300 rounded-2xl bg-white shadow-md;
+}
+
+.cuenta-card-header {
+  @apply p-5 border-b border-gray-200;
+}
+
+.cuenta-card-title {
+  @apply m-0 text-slate-900 text-lg font-extrabold;
+}
+
+.cuenta-card-description {
+  @apply mt-2 mb-0 text-slate-500 text-sm leading-relaxed;
+}
+
+.cuenta-profile-grid {
+  @apply grid grid-cols-2 gap-4 p-5;
+}
+
+.cuenta-profile-item {
+  @apply p-4 border border-gray-200 rounded-xl bg-slate-50;
+}
+
+.cuenta-profile-label {
+  @apply block mb-1 text-slate-500 text-xs font-bold;
+}
+
+.cuenta-profile-value {
+  @apply text-slate-900 text-sm font-extrabold;
+}
+
+.cuenta-status {
+  @apply inline-flex items-center justify-center min-h-7 px-3 py-1 rounded-full text-xs font-extrabold;
+}
+
+.cuenta-status-activo {
+  @apply bg-green-100 text-green-800;
+}
+
+.cuenta-status-inactivo {
+  @apply bg-red-100 text-red-800;
+}
+
+.cuenta-password-form {
+  @apply flex flex-col gap-4 p-5;
+}
+
+.cuenta-field {
+  @apply flex flex-col gap-2;
+}
+
+.cuenta-label {
+  @apply text-slate-700 text-sm font-bold;
+}
+
+.cuenta-input {
+  @apply w-full min-h-11 px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-900;
+}
+
+.cuenta-input:focus {
+  @apply outline-none border-blue-600 ring-4 ring-blue-600/15;
+}
+
+.cuenta-help {
+  @apply m-0 text-slate-500 text-xs leading-snug;
+}
+
+.cuenta-message {
+  @apply p-3 rounded-xl text-sm font-bold;
+}
+
+.cuenta-message-error {
+  @apply bg-red-50 text-red-800;
+}
+
+.cuenta-message-success {
+  @apply bg-green-100 text-green-800;
+}
+
+.cuenta-password-actions {
+  @apply flex justify-end p-5 border-t border-gray-200;
+}
+
+.cuenta-primary-button {
+  @apply inline-flex items-center justify-center min-h-10 px-4 py-3 border border-transparent rounded-xl bg-blue-600 text-white text-sm font-extrabold cursor-pointer whitespace-nowrap;
+}
+
+.cuenta-primary-button:hover {
+  @apply bg-blue-700;
+}
+
+.cuenta-primary-button:disabled {
+  @apply opacity-60 cursor-not-allowed;
+}
+
+.cuenta-info-card {
+  @apply mt-5 p-5 border-blue-100 bg-blue-50;
+}
+
+.cuenta-info-title {
+  @apply m-0 text-blue-800 text-base font-extrabold;
+}
+
+.cuenta-info-text {
+  @apply mt-2 mb-0 text-blue-900 leading-relaxed;
+}
+
+@media (max-width: 1024px) {
+  .cuenta-layout {
+    @apply grid-cols-1;
+  }
+}
+
+@media (max-width: 768px) {
+  .cuenta-profile-grid {
+    @apply grid-cols-1;
+  }
+
+  .cuenta-password-actions {
+    @apply justify-stretch;
+  }
+
+  .cuenta-primary-button {
+    @apply w-full;
+  }
+}
+
+@media (max-width: 480px) {
+  .cuenta-title {
+    @apply text-2xl;
+  }
+
+  .cuenta-card-header,
+  .cuenta-profile-grid,
+  .cuenta-password-form,
+  .cuenta-password-actions,
+  .cuenta-info-card {
+    @apply p-4;
+  }
+}
+
+/* =========================================================
+   04. RESPONSIVE GENERAL
+========================================================= */
+
+@media (max-width: 1024px) {
+  .admin-layout {
+    @apply block;
+  }
+
+  .mobile-sidebar-button {
+    @apply fixed top-3 left-4 z-120 flex items-center justify-center w-11 h-11 border-0 rounded-xl bg-gray-900 text-white text-2xl leading-none shadow-2xl;
+  }
+
+  .mobile-sidebar-backdrop {
+    @apply fixed inset-0 z-90 block bg-slate-900/60;
+  }
+
+  .admin-sidebar {
+    @apply fixed top-0 left-0 z-110 block w-70 max-w-[85vw] h-screen min-h-screen overflow-y-auto transition-transform duration-200;
+    transform: translateX(-100%);
+  }
+
+  .admin-sidebar.admin-sidebar-open {
+    transform: translateX(0);
+  }
+
+  .admin-content {
+    @apply w-full min-h-screen ml-0;
+  }
+
+  .app-navbar {
+    @apply min-h-16 pl-20 pr-4;
+  }
+
+  .app-navbar-brand {
+    @apply max-w-[48vw] overflow-hidden text-ellipsis;
+  }
+
+  .app-navbar-user {
+    @apply gap-2;
+  }
+
+  .app-navbar-user-info {
+    @apply text-xs;
+  }
+
+  .admin-page {
+    @apply px-4 py-6;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-navbar-user-info {
+    @apply hidden;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobile-sidebar-button {
+    @apply top-3 left-3 w-10 h-10 text-xl;
+  }
+
+  .app-navbar {
+    @apply pl-[4.7rem] pr-3;
+  }
+
+  .app-navbar-brand {
+    @apply max-w-[50vw];
+  }
+
+  .admin-page {
+    @apply px-4 py-5;
+  }
+}
+
+@media (min-width: 1025px) {
+  .mobile-sidebar-button {
+    @apply hidden;
+  }
+
+  .mobile-sidebar-backdrop {
+    @apply hidden;
+  }
+
+  .admin-sidebar {
+    @apply relative;
+    transform: none;
+  }
+}

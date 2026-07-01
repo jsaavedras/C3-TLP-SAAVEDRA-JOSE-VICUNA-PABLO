@@ -1,50 +1,59 @@
 import prisma from '../../utils/prisma'
 
+function puedeGestionarClientes(perfil: string) {
+  return perfil === 'administrador' || perfil === 'ejecutivo'
+}
+
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
 
-  if (session.user.perfilNombre !== 'administrador' && session.user.perfilNombre !== 'ejecutivo') {
-    throw createError({ 
-      statusCode: 403, 
-      statusMessage: 'No autorizado: Solo administradores y ejecutivos pueden crear clientes' 
-    })
+  if (!puedeGestionarClientes(session.user.perfilNombre)) {
+    throw createError({ statusCode: 403, statusMessage: 'No autorizado para crear clientes' })
   }
 
-  const body = await readBody(event)
+  const body = await readBody(event) || {}
+  const rut = String(body.rut || '').trim()
+  const nombres = String(body.nombres || '').trim()
+  const apellidos = String(body.apellidos || '').trim()
+  const email = String(body.email || '').trim().toLowerCase()
+  const telefono = String(body.telefono || '').trim()
+  const direccion = String(body.direccion || '').trim()
+  const licenciaConducir = String(body.licencia_conducir || '').trim()
 
-  if (
-    !body.rut || 
-    !body.nombres || 
-    !body.apellidos || 
-    !body.email || 
-    !body.telefono || 
-    !body.direccion || 
-    !body.licencia_conducir
-  ) {
-    throw createError({ statusCode: 400, statusMessage: 'Todos los campos del cliente son obligatorios' })
+  if (!rut || !nombres || !apellidos || !email || !telefono || !direccion || !licenciaConducir) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Todos los campos del cliente son obligatorios'
+    })
   }
 
   try {
-    const nuevoCliente = await prisma.clientes.create({
+    const cliente = await prisma.clientes.create({
       data: {
-        rut: body.rut,
-        nombres: body.nombres,
-        apellidos: body.apellidos,
-        email: body.email.toLowerCase(),
-        telefono: body.telefono,
-        direccion: body.direccion,
-        licencia_conducir: body.licencia_conducir,
+        rut,
+        nombres,
+        apellidos,
+        email,
+        telefono,
+        direccion,
+        licencia_conducir: licenciaConducir,
         activo: true
       }
     })
-    
-    setResponseStatus(event, 201)
-    return { ok: true, mensaje: 'Cliente creado exitosamente', cliente: nuevoCliente }
 
-  } catch (error: any) {
-    if (error.code === 'P2002') {
-      throw createError({ statusCode: 400, statusMessage: 'El RUT o el Email ya están registrados en el sistema' })
+    setResponseStatus(event, 201)
+
+    return {
+      ok: true,
+      mensaje: 'Cliente creado exitosamente',
+      cliente
     }
-    throw createError({ statusCode: 500, statusMessage: 'Error interno del servidor al crear cliente' })
+  }
+  catch (error: any) {
+    if (error?.code === 'P2002') {
+      throw createError({ statusCode: 409, statusMessage: 'El RUT o el email ya están registrados' })
+    }
+
+    throw createError({ statusCode: 500, statusMessage: 'Error interno al crear cliente' })
   }
 })

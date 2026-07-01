@@ -1,287 +1,408 @@
 <template>
-  <div class="p-8 max-w-7xl mx-auto">
+  <!-- Página de arriendos -->
+  <section class="arriendos-page">
 
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold text-gray-900">Gestión de Arriendos</h1>
-      <UButton
-        color="primary"
-        icon="i-heroicons-document-plus"
-        @click="abrirModalCrear"
-        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium flex items-center transition-colors"
-      >
-        Registrar Arriendo
-      </UButton>
-    </div>
+    <!-- Encabezado -->
+    <header class="arriendos-header">
+      <div>
+        <h1 class="arriendos-title">
+          Arriendos
+        </h1>
 
-    <UCard>
-      <UTable
-        :data="filasArriendos"
-        :columns="columnas"
-        :loading="pending"
-      >
-        <template #empty-state>
-          <div class="flex flex-col items-center justify-center py-6 text-gray-500">
-            <p>No hay contratos de arriendo registrados en el sistema.</p>
-          </div>
-        </template>
+        <p class="arriendos-description">
+          Revisa los arriendos vigentes y finalizados registrados en el sistema.
+        </p>
+      </div>
 
-        <template #estado-cell="{ row }">
-          <UBadge
-            :color="row.original.estado === 'vigente' ? 'green' : 'gray'"
-            variant="subtle"
-          >
-            {{ row.original.estado.toUpperCase() }}
-          </UBadge>
-        </template>
+      <div class="arriendos-header-actions">
+        <NuxtLink to="/arriendos/crear" class="arriendos-primary-link">
+          Nuevo arriendo
+        </NuxtLink>
+      </div>
+    </header>
 
-        <template #valor_total-cell="{ row }">
-          <span class="font-medium text-gray-400">
-            ${{ row.original.valor_total.toLocaleString('es-CL') }}
-          </span>
-        </template>
+    <!-- Resumen de arriendos -->
+    <section class="arriendos-summary-grid">
 
-        <template #acciones-cell="{ row }">
-          <div class="flex gap-3 items-center">
-            <NuxtLink
-              :to="`/arriendos/${row.original.id}`"
-              class="text-blue-600 hover:text-blue-800 font-medium text-sm"
-            >
-              Ver Detalle
-            </NuxtLink>
+      <article class="arriendos-summary-card">
+        <span class="arriendos-summary-label">
+          Arriendos vigentes
+        </span>
 
-            <NuxtLink
-              v-if="row.original.estado === 'vigente'"
-              :to="`/arriendos/${row.original.id}/devolucion`"
-              class="text-red-600 hover:text-red-800 font-medium text-sm"
-            >
-              Registrar Devolución
-            </NuxtLink>
-            <span v-else class="text-xs text-gray-400">Finalizado</span>
-          </div>
-        </template>
-      </UTable>
-    </UCard>
+        <strong class="arriendos-summary-value">
+          {{ resumen.vigentes }}
+        </strong>
 
-    <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden max-h-[90vh] overflow-y-auto">
+        <p class="arriendos-summary-text">
+          Vehículos actualmente arrendados
+        </p>
+      </article>
 
-        <div class="flex justify-between items-center p-6 border-b border-gray-200">
-          <h3 class="text-xl font-bold text-gray-800">Registrar Contrato de Arriendo</h3>
-          <button type="button" @click="cerrarModal" class="text-gray-400 hover:text-red-500 text-2xl font-bold leading-none">×</button>
+      <article class="arriendos-summary-card">
+        <span class="arriendos-summary-label">
+          Arriendos finalizados
+        </span>
+
+        <strong class="arriendos-summary-value">
+          {{ resumen.finalizados }}
+        </strong>
+
+        <p class="arriendos-summary-text">
+          Arriendos cerrados correctamente
+        </p>
+      </article>
+
+      <article class="arriendos-summary-card">
+        <span class="arriendos-summary-label">
+          Total de arriendos
+        </span>
+
+        <strong class="arriendos-summary-value">
+          {{ arriendos.length }}
+        </strong>
+
+        <p class="arriendos-summary-text">
+          Registros históricos del sistema
+        </p>
+      </article>
+
+      <article class="arriendos-summary-card">
+        <span class="arriendos-summary-label">
+          Ingresos estimados
+        </span>
+
+        <strong class="arriendos-summary-value">
+          {{ formatCurrency(resumen.ingresos) }}
+        </strong>
+
+        <p class="arriendos-summary-text">
+          Suma total de arriendos registrados
+        </p>
+      </article>
+
+    </section>
+
+    <!-- Filtros -->
+    <section class="arriendos-filters-card">
+
+      <div class="arriendos-filters-grid">
+
+        <!-- Buscador -->
+        <div class="arriendos-field">
+          <label class="arriendos-label">
+            Buscar arriendo
+          </label>
+
+          <input v-model="busqueda" type="text" class="arriendos-input" placeholder="Buscar por cliente, patente, marca o modelo">
         </div>
 
-        <form @submit.prevent="guardarArriendo" class="p-6 space-y-4 text-black">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Seleccionar Cliente *</label>
-            <select v-model="formulario.cliente_id" class="w-full border border-gray-300 rounded-md px-3 py-2 bg-white" required>
-              <option value="" disabled>-- Seleccione un cliente --</option>
-              <option v-for="c in listaClientes" :key="c.id" :value="c.id">
-                {{ c.nombres }} {{ c.apellidos }} (RUT: {{ c.rut }})
-              </option>
-            </select>
-          </div>
+        <!-- Filtro estado -->
+        <div class="arriendos-field">
+          <label class="arriendos-label">
+            Estado
+          </label>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Seleccionar Vehículo Disponible *</label>
-            <select v-model="formulario.vehiculo_id" class="w-full border border-gray-300 rounded-md px-3 py-2 bg-white" required>
-              <option value="" disabled>-- Seleccione un vehículo disponible --</option>
-              <option v-for="v in listaVehiculosDisponibles" :key="v.id" :value="v.id">
-                {{ v.marca }} {{ v.modelo }} ({{ v.patente }})
-              </option>
-            </select>
-          </div>
+          <select v-model="filtroEstado" class="arriendos-select">
+            <option value="">
+              Todos los estados
+            </option>
+            <option value="vigente">
+              Vigente
+            </option>
+            <option value="finalizado">
+              Finalizado
+            </option>
+          </select>
+        </div>
 
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Inicio *</label>
-              <input v-model="formulario.fecha_inicio" :min="hoy" type="date" class="w-full border border-gray-300 rounded-md px-3 py-2" required />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Término *</label>
-              <input v-model="formulario.fecha_termino" :min="formulario.fecha_inicio || hoy" type="date" class="w-full border border-gray-300 rounded-md px-3 py-2" required />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Hora de Entrega *</label>
-              <input v-model="formulario.hora_entrega" type="time" class="w-full border border-gray-300 rounded-md px-3 py-2" required />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Fotografía de Entrega *</label>
-              <!-- Restricción PDF #11: usar el componente FileUpload de NuxtUI -->
-              <UFileUpload
-                v-model="archivoEntrega"
-                accept="image/*"
-                icon="i-heroicons-camera"
-                label="Subir foto de entrega"
-                description="JPG, PNG (máx. 5MB)"
-                class="w-full min-h-24"
-              />
-            </div>
-          </div>
-
-          <div v-if="vehiculoSeleccionado" class="bg-blue-50 p-4 rounded-md border border-blue-200 text-sm text-slate-700">
-            <div class="flex justify-between">
-              <span>Valor Diario del Vehículo:</span>
-              <span class="font-semibold">${{ valorDiario.toLocaleString('es-CL') }}</span>
-            </div>
-            <div class="flex justify-between text-base font-bold text-blue-700 pt-2 border-t border-blue-200 mt-1">
-              <span>Costo Total Estimado ({{ formulario.dias_arriendo }} días):</span>
-              <span>${{ costoTotal.toLocaleString('es-CL') }}</span>
-            </div>
-          </div>
-
-          <UAlert v-if="errorMsg" color="red" variant="soft" :title="errorMsg" />
-
-          <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
-            <button type="button" @click="cerrarModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md font-medium">Cancelar</button>
-            <button type="submit" :disabled="guardando" class="px-4 py-2 bg-blue-600 text-white rounded-md font-medium disabled:opacity-50">
-              {{ guardando ? 'Registrando...' : 'Confirmar Arriendo' }}
-            </button>
-          </div>
-        </form>
       </div>
+
+    </section>
+
+    <div v-if="mensajeError" class="mb-4 rounded-lg bg-red-50 p-4 text-sm font-bold text-red-800">
+      {{ mensajeError }}
     </div>
 
-  </div>
+    <section v-if="cargando" class="rounded-lg bg-white p-6 text-center text-sm font-bold text-slate-600">
+      Cargando arriendos...
+    </section>
+
+    <section v-else-if="arriendosFiltrados.length > 0" class="grid gap-4">
+      <ArriendoCard
+        v-for="arriendo in arriendosFiltrados"
+        :key="arriendo.id"
+        :arriendo="arriendo"
+        @ver-detalle="verDetalle"
+        @registrar-devolucion="registrarDevolucion"
+      />
+    </section>
+
+    <BaseEmptyState
+      v-else
+      titulo="No hay arriendos para mostrar"
+      mensaje="Cuando se registren arriendos, apareceran en esta seccion."
+      accion-texto="Nuevo arriendo"
+      @accion="irCrearArriendo"
+    />
+
+    <!-- Tabla de arriendos -->
+    <section v-if="false" class="arriendos-table-card">
+
+      <div class="arriendos-table-wrapper">
+
+        <table class="arriendos-table">
+
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Vehículo</th>
+              <th>Patente</th>
+              <th>Inicio</th>
+              <th>Término</th>
+              <th>Estado</th>
+              <th>Total</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <!-- Fila de ejemplo: después se repetirá con v-for -->
+            <tr>
+              <td>
+                Juan Pérez
+              </td>
+
+              <td>
+                Toyota Corolla
+              </td>
+
+              <td>
+                ABCD12
+              </td>
+
+              <td>
+                2026-01-01
+              </td>
+
+              <td>
+                2026-01-05
+              </td>
+
+              <td>
+                <span class="arriendos-status arriendos-status-vigente">
+                  Vigente
+                </span>
+              </td>
+
+              <td>
+                $140.000
+              </td>
+
+              <td>
+                <div class="arriendos-table-actions">
+                  <NuxtLink to="/arriendos/1" class="arriendos-secondary-link">
+                    Ver detalle
+                  </NuxtLink>
+
+                  <NuxtLink to="/arriendos/1/devolucion" class="arriendos-warning-link">
+                    Devolución
+                  </NuxtLink>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+    <!-- Versión card para pantallas pequeñas -->
+    <section v-if="false" class="arriendos-mobile-list">
+
+      <!-- Card de ejemplo: después se repetirá con v-for -->
+      <article class="arriendos-mobile-card">
+
+        <header class="arriendos-mobile-card-header">
+          <div>
+            <h2 class="arriendos-mobile-card-title">
+              Juan Pérez
+            </h2>
+
+            <p class="arriendos-mobile-card-subtitle">
+              Toyota Corolla · ABCD12
+            </p>
+          </div>
+
+          <span class="arriendos-status arriendos-status-vigente">
+            Vigente
+          </span>
+        </header>
+
+        <div class="arriendos-mobile-info-grid">
+
+          <div class="arriendos-mobile-info-item">
+            <span class="arriendos-mobile-info-label">
+              Fecha inicio
+            </span>
+
+            <strong class="arriendos-mobile-info-value">
+              2026-01-01
+            </strong>
+          </div>
+
+          <div class="arriendos-mobile-info-item">
+            <span class="arriendos-mobile-info-label">
+              Fecha término
+            </span>
+
+            <strong class="arriendos-mobile-info-value">
+              2026-01-05
+            </strong>
+          </div>
+
+          <div class="arriendos-mobile-info-item">
+            <span class="arriendos-mobile-info-label">
+              Días
+            </span>
+
+            <strong class="arriendos-mobile-info-value">
+              4
+            </strong>
+          </div>
+
+          <div class="arriendos-mobile-info-item">
+            <span class="arriendos-mobile-info-label">
+              Total
+            </span>
+
+            <strong class="arriendos-mobile-info-value">
+              $140.000
+            </strong>
+          </div>
+
+        </div>
+
+        <footer class="arriendos-mobile-actions">
+          <NuxtLink to="/arriendos/1" class="arriendos-secondary-link">
+            Ver detalle
+          </NuxtLink>
+
+          <NuxtLink to="/arriendos/1/devolucion" class="arriendos-warning-link">
+            Registrar devolución
+          </NuxtLink>
+        </footer>
+
+      </article>
+
+    </section>
+
+    <!-- Estado vacío: después se mostrará con v-if -->
+    <section class="arriendos-empty" hidden>
+      <h2 class="arriendos-empty-title">
+        No hay arriendos para mostrar
+      </h2>
+
+      <p class="arriendos-empty-text">
+        Cuando se registren arriendos, aparecerán en esta sección.
+      </p>
+    </section>
+
+  </section>
 </template>
 
-<script setup>
-import { ref, computed, reactive, watch } from 'vue'
+<script setup lang="ts">
+import ArriendoCard from '~/components/arriendos/ArriendoCard.vue'
+import type { Arriendo } from '~/types/arriendo'
+import { formatCurrency } from '~/utils/formatCurrency'
+import { getApiErrorMessage } from '~/utils/getApiErrorMessage'
 
-const isModalOpen = ref(false)
-const guardando = ref(false)
-const errorMsg = ref('')
-const archivoEntrega = ref(null)
+const arriendos = ref<Arriendo[]>([])
 
-const estadoInicial = {
-  cliente_id: '',
-  vehiculo_id: '',
-  fecha_inicio: '',
-  fecha_termino: '',
-  hora_entrega: '09:00',
-  dias_arriendo: 1
-}
+const busqueda = ref('')
+const filtroEstado = ref('')
 
-const formulario = reactive({ ...estadoInicial })
+const cargando = ref(false)
+const mensajeError = ref('')
 
-const columnas = [
-  { id: 'id', accessorKey: 'id', header: 'N°' },
-  { id: 'cliente_nombre', accessorKey: 'cliente_nombre', header: 'Cliente' },
-  { id: 'vehiculo_info', accessorKey: 'vehiculo_info', header: 'Vehículo (Patente)' },
-  { id: 'fecha_inicio', accessorKey: 'fecha_inicio', header: 'Inicio' },
-  { id: 'fecha_termino', accessorKey: 'fecha_termino', header: 'Término' },
-  { id: 'valor_total', accessorKey: 'valor_total', header: 'Total' },
-  { id: 'estado', accessorKey: 'estado', header: 'Estado' },
-  { id: 'acciones', header: 'Acciones' }
-]
+const arriendosFiltrados = computed(() => {
+  const texto = busqueda.value.trim().toLowerCase()
 
-const { data: arriendos, pending, refresh: refreshArriendos } = await useFetch('/api/arriendos')
-const { data: listaClientes } = await useFetch('/api/clientes')
-const { data: listaVehiculos, refresh: refreshVehiculos } = await useFetch('/api/vehiculos')
+  return arriendos.value.filter((arriendo) => {
+    const cliente = arriendo.clientes
+      ? `${arriendo.clientes.nombres} ${arriendo.clientes.apellidos}`.toLowerCase()
+      : ''
 
-const hoy = computed(() => {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    const vehiculo = arriendo.vehiculos
+      ? `${arriendo.vehiculos.marca} ${arriendo.vehiculos.modelo} ${arriendo.vehiculos.patente}`.toLowerCase()
+      : ''
+
+    const coincideTexto = !texto || cliente.includes(texto) || vehiculo.includes(texto)
+    const coincideEstado = !filtroEstado.value || arriendo.estado === filtroEstado.value
+
+    return coincideTexto && coincideEstado
+  })
 })
 
-const listaVehiculosDisponibles = computed(() => {
-  if (!listaVehiculos.value) return []
-  return listaVehiculos.value.filter(v => v.estado === 'disponible')
-})
-
-const filasArriendos = computed(() => {
-  if (!arriendos.value) return []
-  return arriendos.value.map(arr => ({
-    ...arr,
-    cliente_nombre: arr.clientes ? `${arr.clientes.nombres} ${arr.clientes.apellidos}` : 'No asignado',
-    vehiculo_info: arr.vehiculos ? `${arr.vehiculos.marca} ${arr.vehiculos.modelo} (${arr.vehiculos.patente})` : 'No asignado',
-    fecha_inicio: new Date(arr.fecha_inicio).toLocaleDateString('es-CL'),
-    fecha_termino: new Date(arr.fecha_termino).toLocaleDateString('es-CL')
-  }))
-})
-
-const vehiculoSeleccionado = computed(() => {
-  if (!formulario.vehiculo_id || !listaVehiculos.value) return null
-  return listaVehiculos.value.find(v => v.id === formulario.vehiculo_id)
-})
-
-const valorDiario = computed(() => {
-  return vehiculoSeleccionado.value?.tipos_vehiculo?.valor_diario || 0
-})
-
-const costoTotal = computed(() => {
-  return valorDiario.value * (formulario.dias_arriendo || 0)
-})
-
-watch(() => [formulario.fecha_inicio, formulario.fecha_termino], ([inicio, termino]) => {
-  if (inicio && termino) {
-    const f1 = new Date(inicio)
-    const f2 = new Date(termino)
-    const calculoDias = Math.ceil((f2 - f1) / (1000 * 60 * 60 * 24)) + 1
-    formulario.dias_arriendo = calculoDias > 0 ? calculoDias : 1
+const resumen = computed(() => {
+  return {
+    vigentes: arriendos.value.filter((arriendo) => arriendo.estado === 'vigente').length,
+    finalizados: arriendos.value.filter((arriendo) => arriendo.estado === 'finalizado').length,
+    ingresos: arriendos.value.reduce((total, arriendo) => total + arriendo.valor_total, 0),
   }
 })
 
-function abrirModalCrear() {
-  errorMsg.value = ''
-  archivoEntrega.value = null
-  Object.assign(formulario, estadoInicial)
-  formulario.fecha_inicio = hoy.value
-  isModalOpen.value = true
-}
+async function cargarArriendos() {
+  cargando.value = true
+  mensajeError.value = ''
 
-function cerrarModal() {
-  isModalOpen.value = false
-}
-
-async function subirFoto(archivo) {
-  const formData = new FormData()
-  formData.append('file', archivo)
-  const respuesta = await $fetch('/api/upload', { method: 'POST', body: formData })
-  return respuesta.url
-}
-
-async function guardarArriendo() {
-  errorMsg.value = ''
-
-  if (formulario.fecha_inicio < hoy.value) {
-    errorMsg.value = 'La fecha de inicio no puede ser menor a la fecha actual.'
-    return
-  }
-  if (formulario.fecha_termino < formulario.fecha_inicio) {
-    errorMsg.value = 'La fecha de término no puede ser anterior a la fecha de inicio.'
-    return
-  }
-  if (!archivoEntrega.value) {
-    errorMsg.value = 'Es obligatorio adjuntar una fotografía del estado de entrega.'
-    return
-  }
-
-  guardando.value = true
   try {
-    const urlFoto = await subirFoto(archivoEntrega.value)
-
-    await $fetch('/api/arriendos', {
-      method: 'POST',
-      body: {
-        cliente_id: formulario.cliente_id,
-        vehiculo_id: formulario.vehiculo_id,
-        fecha_inicio: formulario.fecha_inicio,
-        fecha_termino: formulario.fecha_termino,
-        fecha_hora_entrega: `${formulario.fecha_inicio}T${formulario.hora_entrega}:00`,
-        fotos_entrega: [urlFoto]
-      }
-    })
-
-    cerrarModal()
-    await refreshArriendos()
-    await refreshVehiculos()
-  } catch (error) {
-    errorMsg.value = error.data?.statusMessage || 'Error al procesar el arriendo.'
-  } finally {
-    guardando.value = false
+    arriendos.value = await $fetch<Arriendo[]>('/api/arriendos')
+  }
+  catch (error) {
+    mensajeError.value = getApiErrorMessage(error, 'No se pudieron cargar los arriendos')
+  }
+  finally {
+    cargando.value = false
   }
 }
+
+function verDetalle(arriendo: Arriendo) {
+  navigateTo(`/arriendos/${arriendo.id}`)
+}
+
+function registrarDevolucion(arriendo: Arriendo) {
+  navigateTo(`/arriendos/${arriendo.id}/devolucion`)
+}
+
+function irCrearArriendo() {
+  navigateTo('/arriendos/crear')
+}
+
+onMounted(() => {
+  cargarArriendos()
+})
+// Lógica pendiente para después:
+//
+// 1. Importar type Arriendo.
+// 2. Cargar arriendos desde GET /api/arriendos.
+// 3. Filtrar por cliente, patente, marca o modelo.
+// 4. Filtrar por estado: vigente / finalizado.
+// 5. Calcular resumen de arriendos vigentes.
+// 6. Calcular resumen de arriendos finalizados.
+// 7. Calcular ingresos totales.
+// 8. Mostrar botón de devolución solo si estado === 'vigente'.
+//
+// Campos reales según schema.prisma:
+// cliente_id, vehiculo_id, usuario_id,
+// fecha_inicio, fecha_termino,
+// fecha_hora_entrega, fecha_hora_recepcion,
+// valor_diario_aplicado, dias_arriendo, valor_total,
+// estado, fotos_entrega, fotos_recepcion.
+//
+// Relaciones esperadas:
+// clientes, vehiculos, usuarios.
 </script>

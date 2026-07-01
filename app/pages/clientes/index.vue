@@ -1,277 +1,673 @@
 <template>
-  <div class="p-6 max-w-7xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold text-gray-900">Directorio de Clientes</h1>
-      
-      <button 
-        @click="abrirParaCrear"
-        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium flex items-center transition-colors"
-      >
-        Nuevo Cliente
-      </button>
-    </div>
- 
-    <UCard>
-      <UTable 
-        :data="clientes || []" 
-        :columns="columnas"
-        :loading="pending"
-      >
-        <template #empty-state>
-          <div class="flex flex-col items-center justify-center py-6 text-gray-500">
-            <p>No hay clientes activos en la base de datos.</p>
-          </div>
-        </template>
-        
-        <template #acciones-cell="{ row }">
-          <div class="flex gap-3">
-            <NuxtLink :to="`/clientes/${row.original.id}`" class="text-green-700 hover:text-gray-900 font-medium">Ver</NuxtLink>
-            <button @click="abrirParaEditar(row.original)" class="text-blue-600 hover:text-blue-800 font-medium">Editar</button>
-            <button
-              @click="solicitarEliminacion(row.original)"
-              :disabled="tieneArriendosActivos(row.original)"
-              :title="tieneArriendosActivos(row.original) ? 'No se puede eliminar un cliente con arriendos no finalizados' : ''"
-              class="font-medium"
-              :class="tieneArriendosActivos(row.original)
-                ? 'text-gray-400 cursor-not-allowed'
-                : 'text-red-600 hover:text-red-800'"
-            >
-              Eliminar
-            </button>
-          </div>
-        </template>
-      </UTable>
-    </UCard>
- 
-    <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 transition-opacity">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        
-        <div class="flex justify-between items-center p-6 border-b border-gray-200">
-          <h3 class="text-xl font-bold text-gray-800">
-            {{ editandoId ? 'Editar Cliente' : 'Registrar Nuevo Cliente' }}
-          </h3>
-          <button @click="cerrarModal" class="text-gray-400 hover:text-red-500 text-3xl leading-none">&times;</button>
-        </div>
- 
-        <form @submit.prevent="guardarCliente" class="p-6 space-y-5 text-black">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">RUT *</label>
-            <input v-model="formulario.rut" type="text" placeholder="Ej: 12345678-9" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-          </div>
-          
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Nombres *</label>
-              <input v-model="formulario.nombres" type="text" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Apellidos *</label>
-              <input v-model="formulario.apellidos" type="text" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-            </div>
-          </div>
- 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico *</label>
-            <input v-model="formulario.email" type="email" placeholder="correo@ejemplo.com" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-          </div>
- 
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono *</label>
-              <input v-model="formulario.telefono" type="text" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Licencia de Conducir *</label>
-              <input v-model="formulario.licencia_conducir" type="text" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-            </div>
-          </div>
- 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Dirección *</label>
-            <input v-model="formulario.direccion" type="text" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-          </div>
- 
-          <div class="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-200">
-            <button type="button" @click="cerrarModal" class="px-5 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 font-medium transition-colors">Cancelar</button>
-            <button type="submit" :disabled="guardando" class="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium disabled:opacity-50 transition-colors">
-              {{ guardando ? 'Guardando...' : 'Guardar' }}
-            </button>
-          </div>
-        </form>
- 
+  <!-- Página de clientes -->
+  <section class="clientes-page">
+
+    <!-- Encabezado -->
+    <header class="clientes-header">
+      <div>
+        <h1 class="clientes-title">
+          Clientes
+        </h1>
+
+        <p class="clientes-description">
+          Gestiona los clientes registrados, sus datos de contacto, licencia de conducir y estado en el sistema.
+        </p>
       </div>
-    </div>
- 
-    <div v-if="mostrarConfirmacion" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 transition-opacity">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
-        <div class="p-6">
-          <h3 class="text-lg font-bold text-gray-900 mb-2">Confirmar eliminación</h3>
-          <p class="text-sm text-gray-600">
-            ¿Estás seguro de que deseas eliminar a
-            <span class="font-semibold">{{ clienteAEliminar?.nombres }} {{ clienteAEliminar?.apellidos }}</span>?
-            El historial de arriendos seguirá en el sistema.
-          </p>
+
+      <div class="clientes-header-actions">
+        <button type="button" class="clientes-primary-button" @click="abrirModalCrear">
+          Nuevo cliente
+        </button>
+      </div>
+    </header>
+
+    <!-- Resumen -->
+    <section class="clientes-summary-grid">
+
+      <article class="clientes-summary-card">
+        <span class="clientes-summary-label">
+          Clientes activos
+        </span>
+
+        <strong class="clientes-summary-value">
+          {{ clientesActivos }}
+        </strong>
+
+        <p class="clientes-summary-text">
+          Clientes habilitados para arrendar
+        </p>
+      </article>
+
+      <article class="clientes-summary-card">
+        <span class="clientes-summary-label">
+          Clientes inactivos
+        </span>
+
+        <strong class="clientes-summary-value">
+          {{ clientesInactivos }}
+        </strong>
+
+        <p class="clientes-summary-text">
+          Clientes desactivados del sistema
+        </p>
+      </article>
+
+      <article class="clientes-summary-card">
+        <span class="clientes-summary-label">
+          Total clientes
+        </span>
+
+        <strong class="clientes-summary-value">
+          {{ clientes.length }}
+        </strong>
+
+        <p class="clientes-summary-text">
+          Registros históricos de clientes
+        </p>
+      </article>
+
+    </section>
+
+    <!-- Filtros -->
+    <section class="clientes-filters-card">
+
+      <div class="clientes-filters-grid">
+
+        <div class="clientes-field">
+          <label class="clientes-label">
+            Buscar cliente
+          </label>
+
+          <input v-model="busqueda" type="text" class="clientes-input" placeholder="Buscar por RUT, nombre, apellido o correo">
         </div>
-        <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-200">
-          <button
-            type="button"
-            @click="cancelarEliminacion"
-            class="px-5 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 font-medium transition-colors"
-          >
+
+        <div class="clientes-field">
+          <label class="clientes-label">
+            Estado
+          </label>
+
+          <select v-model="filtroEstado" class="clientes-select">
+            <option value="">
+              Todos los estados
+            </option>
+            <option value="activo">
+              Activo
+            </option>
+            <option value="inactivo">
+              Inactivo
+            </option>
+          </select>
+        </div>
+
+      </div>
+
+    </section>
+
+    <div v-if="mensajeError" class="mb-4 rounded-lg bg-red-50 p-4 text-sm font-bold text-red-800">
+      {{ mensajeError }}
+    </div>
+
+    <div v-if="mensajeExito" class="mb-4 rounded-lg bg-green-50 p-4 text-sm font-bold text-green-800">
+      {{ mensajeExito }}
+    </div>
+
+    <section v-if="cargando" class="rounded-lg bg-white p-6 text-center text-sm font-bold text-slate-600">
+      Cargando clientes...
+    </section>
+
+    <section v-else-if="clientesFiltrados.length > 0" class="clientes-table-card">
+      <div class="clientes-table-wrapper">
+        <table class="clientes-table">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>RUT</th>
+              <th>Correo</th>
+              <th>Telefono</th>
+              <th>Licencia</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr v-for="cliente in clientesFiltrados" :key="cliente.id">
+              <td>{{ cliente.nombres }} {{ cliente.apellidos }}</td>
+              <td>{{ cliente.rut }}</td>
+              <td>{{ cliente.email }}</td>
+              <td>{{ cliente.telefono }}</td>
+              <td>{{ cliente.licencia_conducir }}</td>
+              <td>
+                <BaseStatusBadge :tipo="cliente.activo ? 'activo' : 'inactivo'" />
+              </td>
+              <td>
+                <div class="clientes-table-actions">
+                  <NuxtLink :to="`/clientes/${cliente.id}`" class="clientes-secondary-link">
+                    Ver detalle
+                  </NuxtLink>
+
+                  <button type="button" class="clientes-secondary-button" @click="abrirModalEditar(cliente)">
+                    Editar
+                  </button>
+
+                  <button
+                    v-if="cliente.activo"
+                    type="button"
+                    class="clientes-danger-button"
+                    @click="pedirDesactivar(cliente)"
+                  >
+                    Desactivar
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <BaseEmptyState
+      v-else
+      titulo="No hay clientes para mostrar"
+      mensaje="Cuando registres clientes, apareceran en esta seccion."
+      accion-texto="Nuevo cliente"
+      @accion="abrirModalCrear"
+    />
+
+    <!-- Tabla de clientes -->
+    <section v-if="false" class="clientes-table-card">
+
+      <div class="clientes-table-wrapper">
+
+        <table class="clientes-table">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>RUT</th>
+              <th>Correo</th>
+              <th>Teléfono</th>
+              <th>Licencia</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <!-- Fila de ejemplo: después se repetirá con v-for -->
+            <tr>
+              <td>
+                Juan Pérez
+              </td>
+
+              <td>
+                12.345.678-9
+              </td>
+
+              <td>
+                juan@email.cl
+              </td>
+
+              <td>
+                +56 9 1234 5678
+              </td>
+
+              <td>
+                B123456
+              </td>
+
+              <td>
+                <span class="clientes-status clientes-status-activo">
+                  Activo
+                </span>
+              </td>
+
+              <td>
+                <div class="clientes-table-actions">
+                  <NuxtLink to="/clientes/1" class="clientes-secondary-link">
+                    Ver detalle
+                  </NuxtLink>
+
+                  <button type="button" class="clientes-secondary-button">
+                    Editar
+                  </button>
+
+                  <button type="button" class="clientes-danger-button">
+                    Desactivar
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+    </section>
+
+    <!-- Vista móvil -->
+    <section v-if="false" class="clientes-mobile-list">
+
+      <!-- Card de ejemplo: después se repetirá con v-for -->
+      <article class="clientes-mobile-card">
+
+        <header class="clientes-mobile-card-header">
+          <div>
+            <h2 class="clientes-mobile-card-title">
+              Juan Pérez
+            </h2>
+
+            <p class="clientes-mobile-card-subtitle">
+              12.345.678-9 · juan@email.cl
+            </p>
+          </div>
+
+          <span class="clientes-status clientes-status-activo">
+            Activo
+          </span>
+        </header>
+
+        <div class="clientes-mobile-info-grid">
+
+          <div class="clientes-mobile-info-item">
+            <span class="clientes-mobile-info-label">
+              Teléfono
+            </span>
+
+            <strong class="clientes-mobile-info-value">
+              +56 9 1234 5678
+            </strong>
+          </div>
+
+          <div class="clientes-mobile-info-item">
+            <span class="clientes-mobile-info-label">
+              Licencia
+            </span>
+
+            <strong class="clientes-mobile-info-value">
+              B123456
+            </strong>
+          </div>
+
+          <div class="clientes-mobile-info-item">
+            <span class="clientes-mobile-info-label">
+              Dirección
+            </span>
+
+            <strong class="clientes-mobile-info-value">
+              Av. Principal 123
+            </strong>
+          </div>
+
+        </div>
+
+        <footer class="clientes-mobile-actions">
+          <NuxtLink to="/clientes/1" class="clientes-secondary-link">
+            Ver detalle
+          </NuxtLink>
+
+          <button type="button" class="clientes-secondary-button">
+            Editar
+          </button>
+
+          <button type="button" class="clientes-danger-button">
+            Desactivar
+          </button>
+        </footer>
+
+      </article>
+
+    </section>
+
+    <!-- Estado vacío -->
+    <section class="clientes-empty" hidden>
+      <h2 class="clientes-empty-title">
+        No hay clientes para mostrar
+      </h2>
+
+      <p class="clientes-empty-text">
+        Cuando registres clientes, aparecerán en esta sección.
+      </p>
+    </section>
+
+    <!-- Modal crear / editar cliente -->
+    <section v-if="modalAbierto" class="clientes-modal-backdrop">
+      <div class="clientes-modal">
+        <header class="clientes-modal-header">
+          <h2 class="clientes-modal-title">
+            {{ modoFormulario === 'crear' ? 'Nuevo cliente' : 'Editar cliente' }}
+          </h2>
+
+          <button type="button" class="clientes-modal-close" @click="cerrarModal">
+            x
+          </button>
+        </header>
+
+        <div class="p-5">
+          <ClienteForm
+            :cliente="elementoSeleccionado"
+            :guardando="guardando"
+            :modo="modoFormulario"
+            @guardar="guardarCliente"
+            @cancelar="cerrarModal"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="clientes-modal-backdrop" hidden>
+      <div class="clientes-modal">
+
+        <header class="clientes-modal-header">
+          <h2 class="clientes-modal-title">
+            Nuevo cliente
+          </h2>
+
+          <button type="button" class="clientes-modal-close">
+            ×
+          </button>
+        </header>
+
+        <form class="clientes-form">
+
+          <div class="clientes-field">
+            <label class="clientes-label">
+              RUT
+            </label>
+
+            <input type="text" class="clientes-input" placeholder="Ej: 12.345.678-9">
+          </div>
+
+          <div class="clientes-field">
+            <label class="clientes-label">
+              Nombres
+            </label>
+
+            <input type="text" class="clientes-input" placeholder="Ej: Juan">
+          </div>
+
+          <div class="clientes-field">
+            <label class="clientes-label">
+              Apellidos
+            </label>
+
+            <input type="text" class="clientes-input" placeholder="Ej: Pérez">
+          </div>
+
+          <div class="clientes-field">
+            <label class="clientes-label">
+              Correo electrónico
+            </label>
+
+            <input type="email" class="clientes-input" placeholder="Ej: cliente@email.cl">
+          </div>
+
+          <div class="clientes-field">
+            <label class="clientes-label">
+              Teléfono
+            </label>
+
+            <input type="text" class="clientes-input" placeholder="Ej: +56 9 1234 5678">
+          </div>
+
+          <div class="clientes-field">
+            <label class="clientes-label">
+              Licencia de conducir
+            </label>
+
+            <input type="text" class="clientes-input" placeholder="Ej: B123456">
+          </div>
+
+          <div class="clientes-field clientes-field-full">
+            <label class="clientes-label">
+              Dirección
+            </label>
+
+            <input type="text" class="clientes-input" placeholder="Ej: Av. Principal 123">
+          </div>
+
+        </form>
+
+        <footer class="clientes-modal-actions">
+          <button type="button" class="clientes-secondary-button">
             Cancelar
           </button>
-          <button
-            type="button"
-            @click="confirmarEliminacion"
-            :disabled="eliminando"
-            class="px-5 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium disabled:opacity-50 transition-colors"
-          >
-            {{ eliminando ? 'Eliminando...' : 'Eliminar' }}
+
+          <button type="button" class="clientes-primary-button">
+            Guardar cliente
           </button>
-        </div>
+        </footer>
+
       </div>
-    </div>
- 
-    <div v-if="mostrarExito" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 transition-opacity">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
-        <div class="p-6">
-          <h3 class="text-lg font-bold text-gray-900 mb-2">Cliente registrado</h3>
-          <p class="text-sm text-gray-600">
-            <span class="font-semibold">{{ nombreClienteCreado }}</span> fue registrado exitosamente en el sistema.
-          </p>
-        </div>
-        <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-200">
-          <button
-            type="button"
-            @click="mostrarExito = false"
-            class="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
-          >
-            Aceptar
+    </section>
+
+    <!-- Modal confirmar desactivación -->
+    <section class="clientes-confirm-backdrop" hidden>
+      <div class="clientes-confirm-modal">
+
+        <header class="clientes-confirm-header">
+          <h2 class="clientes-confirm-title">
+            Confirmar desactivación
+          </h2>
+        </header>
+
+        <p class="clientes-confirm-text">
+          ¿Seguro que deseas desactivar este cliente? No se eliminará del sistema, pero quedará inactivo.
+        </p>
+
+        <footer class="clientes-confirm-actions">
+          <button type="button" class="clientes-secondary-button">
+            Cancelar
           </button>
-        </div>
+
+          <button type="button" class="clientes-danger-button">
+            Confirmar desactivación
+          </button>
+        </footer>
+
       </div>
-    </div>
-  </div>
+    </section>
+
+    <BaseConfirmModal
+      :abierto="confirmacionAbierta"
+      titulo="Confirmar desactivacion"
+      :mensaje="mensajeConfirmacion"
+      texto-confirmar="Desactivar"
+      tipo="danger"
+      :cargando="guardando"
+      @cancelar="cerrarConfirmacion"
+      @confirmar="desactivarCliente"
+    />
+
+  </section>
 </template>
- 
-<script setup>
-import { ref, reactive } from 'vue'
- 
-const isModalOpen = ref(false)
+
+<script setup lang="ts">
+import type { Cliente } from '~/types/cliente'
+import { getApiErrorMessage } from '~/utils/getApiErrorMessage'
+
+interface ClientePayload {
+  rut: string
+  nombres: string
+  apellidos: string
+  email: string
+  telefono: string
+  direccion: string
+  licencia_conducir: string
+  activo: boolean
+}
+
+const clientes = ref<Cliente[]>([])
+
+const busqueda = ref('')
+const filtroEstado = ref('')
+
+const modalAbierto = ref(false)
+const confirmacionAbierta = ref(false)
+const modoFormulario = ref<'crear' | 'editar'>('crear')
+const elementoSeleccionado = ref<Cliente | null>(null)
+
+const cargando = ref(false)
 const guardando = ref(false)
-const editandoId = ref(null)
- 
-const mostrarConfirmacion = ref(false)
-const clienteAEliminar = ref(null)
-const eliminando = ref(false)
- 
-const mostrarExito = ref(false)
-const nombreClienteCreado = ref('')
- 
-const columnas = [
-  { id: 'rut', accessorKey: 'rut', header: 'RUT' },
-  { id: 'nombres', accessorKey: 'nombres', header: 'Nombres' },
-  { id: 'apellidos', accessorKey: 'apellidos', header: 'Apellidos' },
-  { id: 'email', accessorKey: 'email', header: 'Correo' },
-  { id: 'telefono', accessorKey: 'telefono', header: 'Teléfono' },
-  { id: 'licencia_conducir', accessorKey: 'licencia_conducir', header: 'Licencia' },
-  { id: 'direccion', accessorKey: 'direccion', header: 'Dirección' },
-  { id: 'acciones', header: 'Acciones' }
-]
- 
-const { data: clientes, pending, refresh } = await useFetch('/api/clientes')
- 
-const estadoInicial = {
-  rut: '',
-  nombres: '',
-  apellidos: '',
-  email: '',
-  telefono: '',
-  direccion: '',
-  licencia_conducir: ''
-}
- 
-const formulario = reactive({ ...estadoInicial })
- 
-function abrirParaCrear() {
-  editandoId.value = null
-  Object.assign(formulario, estadoInicial)
-  isModalOpen.value = true
-}
- 
-function abrirParaEditar(cliente) {
-  editandoId.value = cliente.id
-  Object.assign(formulario, cliente)
-  isModalOpen.value = true
-}
- 
-function cerrarModal() {
-  isModalOpen.value = false
-  Object.assign(formulario, estadoInicial)
-  editandoId.value = null
-}
- 
-async function guardarCliente() {
-  if (!formulario.rut || !formulario.nombres || !formulario.apellidos || !formulario.email || !formulario.telefono || !formulario.direccion || !formulario.licencia_conducir) {
-    alert('Por favor complete todos los campos obligatorios.')
-    return
+const mensajeError = ref('')
+const mensajeExito = ref('')
+
+const clientesFiltrados = computed(() => {
+  const texto = busqueda.value.trim().toLowerCase()
+
+  return clientes.value.filter((cliente) => {
+    const nombreCompleto = `${cliente.nombres} ${cliente.apellidos}`.toLowerCase()
+    const coincideTexto = !texto
+      || cliente.rut.toLowerCase().includes(texto)
+      || nombreCompleto.includes(texto)
+      || cliente.email.toLowerCase().includes(texto)
+
+    const coincideEstado = !filtroEstado.value
+      || (filtroEstado.value === 'activo' && cliente.activo)
+      || (filtroEstado.value === 'inactivo' && !cliente.activo)
+
+    return coincideTexto && coincideEstado
+  })
+})
+
+const clientesActivos = computed(() => clientes.value.filter((cliente) => cliente.activo).length)
+const clientesInactivos = computed(() => clientes.value.filter((cliente) => !cliente.activo).length)
+
+const mensajeConfirmacion = computed(() => {
+  if (!elementoSeleccionado.value) {
+    return 'Seguro que deseas desactivar este cliente?'
   }
- 
-  guardando.value = true
+
+  return `Seguro que deseas desactivar a ${elementoSeleccionado.value.nombres} ${elementoSeleccionado.value.apellidos}?`
+})
+
+async function cargarClientes() {
+  cargando.value = true
+  limpiarMensajes()
+
   try {
-    const endpoint = editandoId.value ? `/api/clientes/${editandoId.value}` : '/api/clientes'
-    const method = editandoId.value ? 'PUT' : 'POST'
- 
-    await $fetch(endpoint, {
-      method: method,
-      body: formulario
-    })
-    
-    if (editandoId.value) {
-      alert('Cliente actualizado correctamente.')
-    } else {
-      nombreClienteCreado.value = `${formulario.nombres} ${formulario.apellidos}`
-      mostrarExito.value = true
+    clientes.value = await $fetch<Cliente[]>('/api/clientes')
+  }
+  catch (error) {
+    mensajeError.value = getApiErrorMessage(error, 'No se pudieron cargar los clientes')
+  }
+  finally {
+    cargando.value = false
+  }
+}
+
+function limpiarMensajes() {
+  mensajeError.value = ''
+  mensajeExito.value = ''
+}
+
+function abrirModalCrear() {
+  limpiarMensajes()
+  modoFormulario.value = 'crear'
+  elementoSeleccionado.value = null
+  modalAbierto.value = true
+}
+
+function abrirModalEditar(cliente: Cliente) {
+  limpiarMensajes()
+  modoFormulario.value = 'editar'
+  elementoSeleccionado.value = cliente
+  modalAbierto.value = true
+}
+
+function cerrarModal() {
+  modalAbierto.value = false
+  elementoSeleccionado.value = null
+}
+
+async function guardarCliente(payload: ClientePayload) {
+  limpiarMensajes()
+  guardando.value = true
+
+  try {
+    if (modoFormulario.value === 'crear') {
+      await $fetch('/api/clientes', {
+        method: 'POST',
+        body: payload,
+      })
+
+      mensajeExito.value = 'Cliente creado correctamente'
     }
+    else if (elementoSeleccionado.value) {
+      await $fetch(`/api/clientes/${elementoSeleccionado.value.id}`, {
+        method: 'PUT',
+        body: payload,
+      })
+
+      mensajeExito.value = 'Cliente actualizado correctamente'
+    }
+
     cerrarModal()
-    await refresh()
-    
-  } catch (error) {
-    console.error(error)
-    alert(error.data?.statusMessage || 'Hubo un error al procesar la solicitud.')
-  } finally {
+    await cargarClientes()
+  }
+  catch (error) {
+    mensajeError.value = getApiErrorMessage(error, 'No se pudo guardar el cliente')
+  }
+  finally {
     guardando.value = false
   }
 }
- 
-function tieneArriendosActivos(cliente) {
-  return Array.isArray(cliente.arriendos) && cliente.arriendos.length > 0
+
+function pedirDesactivar(cliente: Cliente) {
+  limpiarMensajes()
+  elementoSeleccionado.value = cliente
+  confirmacionAbierta.value = true
 }
- 
-function solicitarEliminacion(cliente) {
-  if (tieneArriendosActivos(cliente)) return
-  clienteAEliminar.value = cliente
-  mostrarConfirmacion.value = true
+
+function cerrarConfirmacion() {
+  confirmacionAbierta.value = false
+  elementoSeleccionado.value = null
 }
- 
-function cancelarEliminacion() {
-  mostrarConfirmacion.value = false
-  clienteAEliminar.value = null
-}
- 
-async function confirmarEliminacion() {
-  if (!clienteAEliminar.value) return
-  eliminando.value = true
+
+async function desactivarCliente() {
+  if (!elementoSeleccionado.value) {
+    return
+  }
+
+  guardando.value = true
+  limpiarMensajes()
+
   try {
-    await $fetch(`/api/clientes/${clienteAEliminar.value.id}`, { method: 'DELETE' })
-    mostrarConfirmacion.value = false
-    clienteAEliminar.value = null
-    await refresh()
-  } catch (error) {
-    alert(error.data?.statusMessage || 'No se pudo desactivar el cliente.')
-  } finally {
-    eliminando.value = false
+    await $fetch(`/api/clientes/${elementoSeleccionado.value.id}`, {
+      method: 'DELETE',
+    })
+
+    mensajeExito.value = 'Cliente desactivado correctamente'
+    cerrarConfirmacion()
+    await cargarClientes()
+  }
+  catch (error) {
+    mensajeError.value = getApiErrorMessage(error, 'No se pudo desactivar el cliente')
+  }
+  finally {
+    guardando.value = false
   }
 }
-</script>
 
+onMounted(() => {
+  cargarClientes()
+})
+// Lógica pendiente para después:
+//
+// 1. Importar type Cliente.
+// 2. Cargar clientes desde GET /api/clientes.
+// 3. Filtrar por texto: rut, nombres, apellidos o email.
+// 4. Filtrar por estado activo / inactivo.
+// 5. Abrir modal para crear cliente.
+// 6. Abrir modal para editar cliente.
+// 7. Crear cliente con POST /api/clientes.
+// 8. Editar cliente con PUT /api/clientes/:id.
+// 9. Desactivar cliente con confirmación.
+//
+// Campos reales según schema.prisma:
+// rut, nombres, apellidos, email, telefono,
+// direccion, licencia_conducir, activo.
+//
+// Regla importante:
+// - No se elimina físicamente el cliente.
+// - Para darlo de baja se usa activo: false.
+</script>

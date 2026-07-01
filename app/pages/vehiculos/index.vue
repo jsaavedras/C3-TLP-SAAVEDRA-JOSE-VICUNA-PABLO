@@ -1,345 +1,813 @@
 <template>
-  <div class="p-8 max-w-7xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold text-gray-900">Directorio de Vehículos</h1>
- 
-      <button
-        v-if="esAdmin"
-        @click="abrirParaCrear"
-        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium flex items-center transition-colors"
-      >
-        Nuevo Vehículo
-      </button>
-    </div>
- 
-    <UCard>
-      <UTable
-        :data="filasVehiculos"
-        :columns="columnas"
-        :loading="pending"
-      >
-        <template #empty-state>
-          <div class="flex flex-col items-center justify-center py-6 text-gray-500">
-            <p>No hay vehículos registrados en la base de datos.</p>
-          </div>
-        </template>
- 
-        <template #estado-cell="{ row }">
-          <select
-            :value="row.original.estado"
-            :disabled="row.original.estado === 'arrendado'"
-            class="text-xs font-semibold rounded px-2 py-1 border"
-            :class="colorPorEstadoSelect(row.original.estado)"
-            @change="cambiarEstado(row.original, $event.target.value)"
-          >
-            <option value="disponible">DISPONIBLE</option>
-            <option value="en_mantenimiento">EN MANTENIMIENTO</option>
-            <option value="de_baja">DE BAJA</option>
-            <option value="arrendado" disabled>ARRENDADO</option>
-          </select>
-        </template>
- 
-        <template #foto_url-cell="{ row }">
-          <a v-if="row.original.foto_url" :href="row.original.foto_url" target="_blank" class="text-blue-500 hover:underline text-sm">
-            Ver foto
-          </a>
-          <span v-else class="text-gray-400 text-sm">Sin imagen</span>
-        </template>
- 
-        <template #acciones-cell="{ row }">
-          <div v-if="esAdmin" class="flex gap-3">
-            <button @click="abrirParaEditar(row.original)" class="text-blue-600 hover:text-blue-800 font-medium text-sm">Editar</button>
-            <button
-              @click="solicitarEliminacion(row.original)"
-              :disabled="row.original.estado === 'arrendado'"
-              :title="row.original.estado === 'arrendado' ? 'No se puede eliminar un vehículo arrendado' : ''"
-              class="font-medium text-sm"
-              :class="row.original.estado === 'arrendado'
-                ? 'text-gray-400 cursor-not-allowed'
-                : 'text-red-600 hover:text-red-800'"
-            >
-              Eliminar
-            </button>
-          </div>
-          <div v-else class="text-gray-400 text-xs">Sin permisos de edición</div>
-        </template>
-      </UTable>
-    </UCard>
- 
-    <div v-if="isModalOpen && esAdmin" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 transition-opacity">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
- 
-        <div class="flex justify-between items-center p-6 border-b border-gray-200">
-          <h3 class="text-xl font-bold text-gray-800">
-            {{ editandoId ? 'Editar Vehículo' : 'Registrar Nuevo Vehículo' }}
-          </h3>
-          <button type="button" @click="cerrarModal" class="text-gray-400 hover:text-red-500 text-2xl font-bold leading-none">X</button>
-        </div>
- 
-        <form @submit.prevent="guardarVehiculo" class="p-6 space-y-4 text-black">
- 
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Patente *</label>
-              <input v-model="formulario.patente" type="text" placeholder="Ej: AB1234" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase" required />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Vehículo *</label>
-              <select v-model="formulario.tipo_id" class="w-full border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                <option value="" disabled>-- Seleccione el tipo --</option>
-                <option v-for="t in listaTipos" :key="t.id" :value="t.id">
-                  {{ t.nombre }}
-                </option>
-              </select>
-            </div>
-          </div>
- 
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Marca *</label>
-              <input v-model="formulario.marca" type="text" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Modelo *</label>
-              <input v-model="formulario.modelo" type="text" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-            </div>
-          </div>
- 
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Año *</label>
-              <input v-model.number="formulario.anio" type="number" min="1990" max="2030" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Color *</label>
-              <input v-model="formulario.color" type="text" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-            </div>
-          </div>
- 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              Fotografía del Vehículo {{ editandoId ? '(opcional, deja vacío para mantener la actual)' : '*' }}
-            </label>
-            <UFileUpload
-              v-model="archivoFoto"
-              accept="image/*"
-              icon="i-heroicons-photo"
-              label="Arrastra o haz clic para subir la foto"
-              description="JPG, PNG o GIF (máx. 5MB)"
-              class="w-full min-h-32"
-            />
-            <a v-if="editandoId && formulario.foto_url && !archivoFoto" :href="formulario.foto_url" target="_blank" class="text-xs text-blue-500 hover:underline mt-1 inline-block">
-              Ver fotografía actual
-            </a>
-          </div>
- 
-          <UAlert v-if="errorMsg" color="red" variant="soft" :title="errorMsg" />
- 
-          <div class="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-200">
-            <button type="button" @click="cerrarModal" class="px-5 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 font-medium">Cancelar</button>
-            <button type="submit" :disabled="guardando" class="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium disabled:opacity-50">
-              {{ guardando ? 'Guardando...' : 'Guardar' }}
-            </button>
-          </div>
-        </form>
- 
+  <!-- Página de vehículos -->
+  <section class="vehicles-page">
+
+    <!-- Encabezado de la página -->
+    <header class="vehicles-header">
+      <div>
+        <h1 class="vehicles-title">
+          Vehículos
+        </h1>
+
+        <p class="vehicles-description">
+          Gestiona los vehículos del sistema, su disponibilidad, mantenimiento y estado de baja.
+        </p>
       </div>
-    </div>
- 
-    <div v-if="mostrarConfirmacion" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 transition-opacity">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
-        <div class="p-6">
-          <h3 class="text-lg font-bold text-gray-900 mb-2">Confirmar eliminación</h3>
-          <p class="text-sm text-gray-600">
-            ¿Estás seguro de que deseas eliminar el vehículo
-            <span class="font-semibold">{{ vehiculoAEliminar?.patente }} ({{ vehiculoAEliminar?.marca }} {{ vehiculoAEliminar?.modelo }})</span>?
-          </p>
+
+      <!-- Acción principal -->
+      <div class="vehicles-header-actions">
+        <button v-if="esAdministrador" type="button" class="vehicles-primary-button" @click="abrirModalCrear">
+          Nuevo vehículo
+        </button>
+      </div>
+    </header>
+
+    <!-- Tarjetas resumen -->
+    <section class="vehicles-summary-grid">
+
+      <article class="vehicles-summary-card">
+        <span class="vehicles-summary-label">
+          Disponibles
+        </span>
+
+        <strong class="vehicles-summary-value">
+          {{ resumen.disponible }}
+        </strong>
+
+        <p class="vehicles-summary-text">
+          Vehículos listos para arriendo
+        </p>
+      </article>
+
+      <article class="vehicles-summary-card">
+        <span class="vehicles-summary-label">
+          Arrendados
+        </span>
+
+        <strong class="vehicles-summary-value">
+          {{ resumen.arrendado }}
+        </strong>
+
+        <p class="vehicles-summary-text">
+          Vehículos con arriendo vigente
+        </p>
+      </article>
+
+      <article class="vehicles-summary-card">
+        <span class="vehicles-summary-label">
+          En mantenimiento
+        </span>
+
+        <strong class="vehicles-summary-value">
+          {{ resumen.en_mantenimiento }}
+        </strong>
+
+        <p class="vehicles-summary-text">
+          Vehículos no disponibles temporalmente
+        </p>
+      </article>
+
+      <article class="vehicles-summary-card">
+        <span class="vehicles-summary-label">
+          De baja
+        </span>
+
+        <strong class="vehicles-summary-value">
+          {{ resumen.de_baja }}
+        </strong>
+
+        <p class="vehicles-summary-text">
+          Vehículos inactivos del sistema
+        </p>
+      </article>
+
+    </section>
+
+    <!-- Filtros -->
+    <section class="vehicles-filters-card">
+
+      <div class="vehicles-filters-grid">
+
+        <!-- Buscador -->
+        <div class="vehicles-field">
+          <label class="vehicles-label">
+            Buscar vehículo
+          </label>
+
+          <input v-model="busqueda" type="text" class="vehicles-input" placeholder="Buscar por patente, marca o modelo">
         </div>
-        <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-200">
-          <button
-            type="button"
-            @click="cancelarEliminacion"
-            class="px-5 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 font-medium transition-colors"
-          >
+
+        <!-- Filtro estado -->
+        <div class="vehicles-field">
+          <label class="vehicles-label">
+            Estado
+          </label>
+
+          <select v-model="filtroEstado" class="vehicles-select">
+            <option value="">
+              Todos los estados
+            </option>
+            <option value="disponible">
+              Disponible
+            </option>
+            <option value="arrendado">
+              Arrendado
+            </option>
+            <option value="en_mantenimiento">
+              En mantenimiento
+            </option>
+            <option value="de_baja">
+              De baja
+            </option>
+          </select>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- Listado de vehículos -->
+    <div v-if="mensajeError" class="mb-4 rounded-lg bg-red-50 p-4 text-sm font-bold text-red-800">
+      {{ mensajeError }}
+    </div>
+
+    <div v-if="mensajeExito" class="mb-4 rounded-lg bg-green-50 p-4 text-sm font-bold text-green-800">
+      {{ mensajeExito }}
+    </div>
+
+    <section v-if="cargando" class="rounded-lg bg-white p-6 text-center text-sm font-bold text-slate-600">
+      Cargando vehiculos...
+    </section>
+
+    <section v-else-if="vehiculosFiltrados.length > 0" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <VehiculoCard
+        v-for="vehiculo in vehiculosFiltrados"
+        :key="vehiculo.id"
+        :vehiculo="vehiculo"
+        @editar="abrirModalEditar"
+        @cambiar-estado="pedirCambioEstado"
+        @dar-baja="pedirDarBaja"
+      />
+    </section>
+
+    <BaseEmptyState
+      v-else
+      titulo="No hay vehiculos para mostrar"
+      mensaje="Cuando registres vehiculos, apareceran en esta seccion."
+      accion-texto="Nuevo vehiculo"
+      @accion="abrirModalCrear"
+    />
+
+    <section v-if="false" class="vehicles-grid">
+
+      <!-- Card de ejemplo: luego se repetirá con v-for -->
+      <article class="vehicles-card">
+
+        <!-- Imagen -->
+        <div class="vehicles-card-image">
+          <span class="vehicles-card-image-text">
+            Imagen del vehículo
+          </span>
+        </div>
+
+        <!-- Contenido -->
+        <div class="vehicles-card-content">
+
+          <!-- Cabecera de la card -->
+          <div class="vehicles-card-header">
+            <div>
+              <h2 class="vehicles-card-title">
+                Toyota Corolla
+              </h2>
+
+              <p class="vehicles-card-subtitle">
+                Patente: ABCD12
+              </p>
+            </div>
+
+            <span class="vehicles-status vehicles-status-disponible">
+              Disponible
+            </span>
+          </div>
+
+          <!-- Datos principales -->
+          <div class="vehicles-info-grid">
+
+            <div class="vehicles-info-item">
+              <span class="vehicles-info-label">
+                Marca
+              </span>
+
+              <strong class="vehicles-info-value">
+                Toyota
+              </strong>
+            </div>
+
+            <div class="vehicles-info-item">
+              <span class="vehicles-info-label">
+                Modelo
+              </span>
+
+              <strong class="vehicles-info-value">
+                Corolla
+              </strong>
+            </div>
+
+            <div class="vehicles-info-item">
+              <span class="vehicles-info-label">
+                Año
+              </span>
+
+              <strong class="vehicles-info-value">
+                2022
+              </strong>
+            </div>
+
+            <div class="vehicles-info-item">
+              <span class="vehicles-info-label">
+                Color
+              </span>
+
+              <strong class="vehicles-info-value">
+                Blanco
+              </strong>
+            </div>
+
+            <div class="vehicles-info-item">
+              <span class="vehicles-info-label">
+                Tipo
+              </span>
+
+              <strong class="vehicles-info-value">
+                Sedán
+              </strong>
+            </div>
+
+            <div class="vehicles-info-item">
+              <span class="vehicles-info-label">
+                Valor diario
+              </span>
+
+              <strong class="vehicles-info-value">
+                $35.000
+              </strong>
+            </div>
+
+          </div>
+
+          <!-- Acciones de la card -->
+          <div class="vehicles-card-actions">
+
+            <button type="button" class="vehicles-secondary-button">
+              Editar
+            </button>
+
+            <button type="button" class="vehicles-warning-button">
+              Mantenimiento
+            </button>
+
+            <button type="button" class="vehicles-danger-button">
+              Dar de baja
+            </button>
+
+          </div>
+
+        </div>
+
+      </article>
+
+    </section>
+
+    <!-- Estado vacío: después se mostrará con v-if cuando no haya datos -->
+    <section class="vehicles-empty" hidden>
+      <h2 class="vehicles-empty-title">
+        No hay vehículos para mostrar
+      </h2>
+
+      <p class="vehicles-empty-text">
+        Cuando registres vehículos, aparecerán en esta sección.
+      </p>
+    </section>
+
+    <!-- Modal crear / editar vehículo: después se controla con v-if -->
+    <section v-if="modalAbierto" class="vehicles-modal-backdrop">
+      <div class="vehicles-modal">
+        <header class="vehicles-modal-header">
+          <h2 class="vehicles-modal-title">
+            {{ modoFormulario === 'crear' ? 'Nuevo vehiculo' : 'Editar vehiculo' }}
+          </h2>
+
+          <button type="button" class="vehicles-modal-close" @click="cerrarModal">
+            x
+          </button>
+        </header>
+
+        <div class="p-5">
+          <VehiculoForm
+            :vehiculo="elementoSeleccionado"
+            :tipos="tipos"
+            :guardando="guardando"
+            :modo="modoFormulario"
+            @guardar="guardarVehiculo"
+            @cancelar="cerrarModal"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section v-if="estadoModalAbierto" class="vehicles-modal-backdrop">
+      <div class="vehicles-confirm-modal">
+        <header class="vehicles-confirm-header">
+          <h2 class="vehicles-confirm-title">
+            Cambiar estado
+          </h2>
+        </header>
+
+        <div class="p-5">
+          <label class="vehicles-label" for="nuevo-estado">
+            Nuevo estado del vehiculo
+          </label>
+
+          <select id="nuevo-estado" v-model="nuevoEstado" class="vehicles-select mt-2">
+            <option value="disponible">
+              Disponible
+            </option>
+            <option value="en_mantenimiento">
+              En mantenimiento
+            </option>
+            <option value="de_baja">
+              De baja
+            </option>
+          </select>
+        </div>
+
+        <footer class="vehicles-confirm-actions">
+          <button type="button" class="vehicles-secondary-button" :disabled="guardando" @click="cerrarEstadoModal">
             Cancelar
           </button>
-          <button
-            type="button"
-            @click="confirmarEliminacion"
-            :disabled="eliminando"
-            class="px-5 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium disabled:opacity-50 transition-colors"
-          >
-            {{ eliminando ? 'Eliminando...' : 'Eliminar' }}
+
+          <button type="button" class="vehicles-warning-button" :disabled="guardando" @click="cambiarEstado">
+            {{ guardando ? 'Guardando...' : 'Guardar estado' }}
           </button>
-        </div>
+        </footer>
       </div>
-    </div>
-  </div>
+    </section>
+
+    <section class="vehicles-modal-backdrop" hidden>
+      <div class="vehicles-modal">
+
+        <header class="vehicles-modal-header">
+          <h2 class="vehicles-modal-title">
+            Nuevo vehículo
+          </h2>
+
+          <button type="button" class="vehicles-modal-close">
+            ×
+          </button>
+        </header>
+
+        <form class="vehicles-form">
+
+          <!-- Tipo de vehículo -->
+          <div class="vehicles-field">
+            <label class="vehicles-label">
+              Tipo de vehículo
+            </label>
+
+            <select class="vehicles-select">
+              <option value="">
+                Selecciona un tipo
+              </option>
+            </select>
+          </div>
+
+          <!-- Patente -->
+          <div class="vehicles-field">
+            <label class="vehicles-label">
+              Patente
+            </label>
+
+            <input type="text" class="vehicles-input" placeholder="Ej: ABCD12">
+          </div>
+
+          <!-- Marca -->
+          <div class="vehicles-field">
+            <label class="vehicles-label">
+              Marca
+            </label>
+
+            <input type="text" class="vehicles-input" placeholder="Ej: Toyota">
+          </div>
+
+          <!-- Modelo -->
+          <div class="vehicles-field">
+            <label class="vehicles-label">
+              Modelo
+            </label>
+
+            <input type="text" class="vehicles-input" placeholder="Ej: Corolla">
+          </div>
+
+          <!-- Año -->
+          <div class="vehicles-field">
+            <label class="vehicles-label">
+              Año
+            </label>
+
+            <input type="number" class="vehicles-input" placeholder="Ej: 2022">
+          </div>
+
+          <!-- Color -->
+          <div class="vehicles-field">
+            <label class="vehicles-label">
+              Color
+            </label>
+
+            <input type="text" class="vehicles-input" placeholder="Ej: Blanco">
+          </div>
+
+          <!-- Estado -->
+          <div class="vehicles-field">
+            <label class="vehicles-label">
+              Estado
+            </label>
+
+            <select class="vehicles-select">
+              <option value="disponible">
+                Disponible
+              </option>
+              <option value="en_mantenimiento">
+                En mantenimiento
+              </option>
+              <option value="de_baja">
+                De baja
+              </option>
+            </select>
+          </div>
+
+          <!-- Foto -->
+          <div class="vehicles-field">
+            <label class="vehicles-label">
+              Foto del vehículo
+            </label>
+
+            <input type="file" class="vehicles-input" accept="image/png, image/jpeg, image/webp">
+          </div>
+
+        </form>
+
+        <footer class="vehicles-modal-actions">
+          <button type="button" class="vehicles-secondary-button">
+            Cancelar
+          </button>
+
+          <button type="button" class="vehicles-primary-button">
+            Guardar vehículo
+          </button>
+        </footer>
+
+      </div>
+    </section>
+
+    <!-- Modal confirmar baja: después se controla con v-if -->
+    <section class="vehicles-confirm-backdrop" hidden>
+      <div class="vehicles-confirm-modal">
+
+        <header class="vehicles-confirm-header">
+          <h2 class="vehicles-confirm-title">
+            Confirmar baja
+          </h2>
+        </header>
+
+        <p class="vehicles-confirm-text">
+          ¿Seguro que deseas dar de baja este vehículo? Esta acción no lo elimina, pero lo dejará inactivo.
+        </p>
+
+        <footer class="vehicles-confirm-actions">
+          <button type="button" class="vehicles-secondary-button">
+            Cancelar
+          </button>
+
+          <button type="button" class="vehicles-danger-button">
+            Confirmar baja
+          </button>
+        </footer>
+
+      </div>
+    </section>
+
+    <BaseConfirmModal
+      :abierto="confirmacionAbierta"
+      titulo="Confirmar baja"
+      :mensaje="mensajeConfirmacion"
+      texto-confirmar="Dar de baja"
+      tipo="danger"
+      :cargando="guardando"
+      @cancelar="cerrarConfirmacion"
+      @confirmar="darBajaVehiculo"
+    />
+
+  </section>
 </template>
- 
-<script setup>
-import { ref, computed, reactive } from 'vue'
- 
+
+<script setup lang="ts">
+import VehiculoCard from '~/components/vehiculos/VehiculoCard.vue'
+import VehiculoForm from '~/components/vehiculos/VehiculoForm.vue'
+import type { TipoVehiculo } from '~/types/tipoVehiculo'
+import type { EstadoVehiculo, Vehiculo } from '~/types/vehiculo'
+import { getApiErrorMessage } from '~/utils/getApiErrorMessage'
+import { isAdmin } from '~/utils/permissions'
+import { subirImagen } from '~/utils/uploadImagenes'
+
+interface VehiculoPayload {
+  tipo_id: number | null
+  patente: string
+  marca: string
+  modelo: string
+  anio: number | null
+  color: string
+  estado: EstadoVehiculo
+  foto_url: string
+  fotoFile: File | null
+  activo: boolean
+}
+
 const { user } = useUserSession()
-const esAdmin = computed(() => user.value?.perfilNombre === 'administrador')
- 
-const isModalOpen = ref(false)
+
+const vehiculos = ref<Vehiculo[]>([])
+const tipos = ref<TipoVehiculo[]>([])
+
+const busqueda = ref('')
+const filtroEstado = ref('')
+
+const modalAbierto = ref(false)
+const estadoModalAbierto = ref(false)
+const confirmacionAbierta = ref(false)
+const modoFormulario = ref<'crear' | 'editar'>('crear')
+const elementoSeleccionado = ref<Vehiculo | null>(null)
+const nuevoEstado = ref<EstadoVehiculo>('disponible')
+
+const cargando = ref(false)
 const guardando = ref(false)
-const editandoId = ref(null)
-const errorMsg = ref('')
-const archivoFoto = ref(null)
- 
-const mostrarConfirmacion = ref(false)
-const vehiculoAEliminar = ref(null)
-const eliminando = ref(false)
- 
-const columnas = [
-  { id: 'patente', accessorKey: 'patente', header: 'Patente' },
-  { id: 'tipo_nombre', accessorKey: 'tipo_nombre', header: 'Tipo' },
-  { id: 'marca', accessorKey: 'marca', header: 'Marca' },
-  { id: 'modelo', accessorKey: 'modelo', header: 'Modelo' },
-  { id: 'anio', accessorKey: 'anio', header: 'Año' },
-  { id: 'color', accessorKey: 'color', header: 'Color' },
-  { id: 'estado', accessorKey: 'estado', header: 'Estado' },
-  { id: 'foto_url', accessorKey: 'foto_url', header: 'Fotografía' },
-  { id: 'acciones', header: 'Acciones' }
-]
- 
-const { data: vehiculos, pending, refresh } = await useFetch('/api/vehiculos')
-const { data: listaTipos } = await useFetch('/api/tipos')
- 
-const filasVehiculos = computed(() => {
-  if (!vehiculos.value) return []
-  return vehiculos.value.map(v => ({
-    ...v,
-    tipo_nombre: v.tipos_vehiculo ? v.tipos_vehiculo.nombre : 'Sin tipo'
-  }))
+const mensajeError = ref('')
+const mensajeExito = ref('')
+
+const esAdministrador = computed(() => isAdmin(user.value))
+
+const vehiculosFiltrados = computed(() => {
+  const texto = busqueda.value.trim().toLowerCase()
+
+  return vehiculos.value.filter((vehiculo) => {
+    const coincideTexto = !texto
+      || vehiculo.patente.toLowerCase().includes(texto)
+      || vehiculo.marca.toLowerCase().includes(texto)
+      || vehiculo.modelo.toLowerCase().includes(texto)
+
+    const coincideEstado = !filtroEstado.value || vehiculo.estado === filtroEstado.value
+
+    return coincideTexto && coincideEstado
+  })
 })
- 
-function colorPorEstadoSelect(estado) {
-  const colores = {
-    disponible: 'bg-green-100 text-green-800 border-green-300',
-    arrendado: 'bg-blue-100 text-blue-800 border-blue-300',
-    en_mantenimiento: 'bg-orange-100 text-orange-800 border-orange-300',
-    de_baja: 'bg-red-100 text-red-800 border-red-300'
+
+const resumen = computed(() => {
+  return {
+    disponible: contarPorEstado('disponible'),
+    arrendado: contarPorEstado('arrendado'),
+    en_mantenimiento: contarPorEstado('en_mantenimiento'),
+    de_baja: contarPorEstado('de_baja'),
   }
-  return colores[estado] || 'bg-gray-100 text-gray-800 border-gray-300'
-}
- 
-async function cambiarEstado(vehiculo, nuevoEstado) {
-  if (nuevoEstado === vehiculo.estado) return
+})
+
+const mensajeConfirmacion = computed(() => {
+  if (!elementoSeleccionado.value) {
+    return 'Seguro que deseas dar de baja este vehiculo?'
+  }
+
+  return `Seguro que deseas dar de baja ${elementoSeleccionado.value.marca} ${elementoSeleccionado.value.modelo}?`
+})
+
+async function cargarDatos() {
+  cargando.value = true
+  limpiarMensajes()
+
   try {
-    await $fetch(`/api/vehiculos/${vehiculo.id}/estado`, {
-      method: 'PATCH',
-      body: { estado: nuevoEstado }
-    })
-    await refresh()
-  } catch (error) {
-    alert(error.data?.statusMessage || 'No se pudo cambiar el estado del vehículo')
-    await refresh()
+    await Promise.all([
+      cargarVehiculos(),
+      cargarTipos(),
+    ])
+  }
+  catch (error) {
+    mensajeError.value = getApiErrorMessage(error, 'No se pudieron cargar los datos')
+  }
+  finally {
+    cargando.value = false
   }
 }
- 
-const estadoInicial = {
-  patente: '',
-  marca: '',
-  modelo: '',
-  anio: new Date().getFullYear(),
-  color: '',
-  tipo_id: '',
-  foto_url: ''
+
+async function cargarVehiculos() {
+  vehiculos.value = await $fetch<Vehiculo[]>('/api/vehiculos')
 }
- 
-const formulario = reactive({ ...estadoInicial })
- 
-function abrirParaCrear() {
-  editandoId.value = null
-  errorMsg.value = ''
-  archivoFoto.value = null
-  Object.assign(formulario, estadoInicial)
-  isModalOpen.value = true
+
+async function cargarTipos() {
+  tipos.value = await $fetch<TipoVehiculo[]>('/api/tipos')
 }
- 
-function abrirParaEditar(vehiculo) {
-  editandoId.value = vehiculo.id
-  errorMsg.value = ''
-  archivoFoto.value = null
-  Object.assign(formulario, vehiculo)
-  isModalOpen.value = true
+
+function limpiarMensajes() {
+  mensajeError.value = ''
+  mensajeExito.value = ''
 }
- 
+
+function abrirModalCrear() {
+  limpiarMensajes()
+
+  if (!esAdministrador.value) {
+    mensajeError.value = 'Solo el administrador puede crear vehiculos'
+    return
+  }
+
+  modoFormulario.value = 'crear'
+  elementoSeleccionado.value = null
+  modalAbierto.value = true
+}
+
+function abrirModalEditar(vehiculo: Vehiculo) {
+  limpiarMensajes()
+
+  if (!esAdministrador.value) {
+    mensajeError.value = 'Solo el administrador puede editar vehiculos'
+    return
+  }
+
+  modoFormulario.value = 'editar'
+  elementoSeleccionado.value = vehiculo
+  modalAbierto.value = true
+}
+
 function cerrarModal() {
-  isModalOpen.value = false
-  editandoId.value = null
+  modalAbierto.value = false
+  elementoSeleccionado.value = null
 }
- 
-async function subirFoto(archivo) {
-  const formData = new FormData()
-  formData.append('file', archivo)
-  const respuesta = await $fetch('/api/upload', { method: 'POST', body: formData })
-  return respuesta.url
-}
- 
-async function guardarVehiculo() {
-  if (!formulario.patente || !formulario.marca || !formulario.modelo || !formulario.anio || !formulario.color || !formulario.tipo_id) {
-    errorMsg.value = 'Complete todos los campos obligatorios.'
-    return
-  }
-  if (!editandoId.value && !archivoFoto.value) {
-    errorMsg.value = 'Debe adjuntar una fotografía del vehículo.'
-    return
-  }
- 
+
+async function guardarVehiculo(payload: VehiculoPayload) {
+  limpiarMensajes()
   guardando.value = true
-  errorMsg.value = ''
+
   try {
-    let foto_url = formulario.foto_url
-    if (archivoFoto.value) {
-      foto_url = await subirFoto(archivoFoto.value)
+    let fotoUrl = payload.foto_url
+
+    if (payload.fotoFile) {
+      fotoUrl = await subirImagen(payload.fotoFile)
     }
- 
-    const endpoint = editandoId.value ? `/api/vehiculos/${editandoId.value}` : '/api/vehiculos'
-    const method = editandoId.value ? 'PUT' : 'POST'
- 
-    await $fetch(endpoint, {
-      method,
-      body: { ...formulario, foto_url }
-    })
- 
+
+    const body = {
+      tipo_id: payload.tipo_id,
+      patente: payload.patente,
+      marca: payload.marca,
+      modelo: payload.modelo,
+      anio: payload.anio,
+      color: payload.color,
+      estado: payload.estado,
+      foto_url: fotoUrl,
+      activo: payload.activo,
+    }
+
+    if (modoFormulario.value === 'crear') {
+      await $fetch('/api/vehiculos', {
+        method: 'POST',
+        body,
+      })
+
+      mensajeExito.value = 'Vehiculo creado correctamente'
+    }
+    else if (elementoSeleccionado.value) {
+      await $fetch(`/api/vehiculos/${elementoSeleccionado.value.id}`, {
+        method: 'PUT',
+        body,
+      })
+
+      mensajeExito.value = 'Vehiculo actualizado correctamente'
+    }
+
     cerrarModal()
-    await refresh()
- 
-  } catch (error) {
-    console.error(error)
-    errorMsg.value = error.data?.statusMessage || 'Hubo un error al procesar la solicitud.'
-  } finally {
+    await cargarVehiculos()
+  }
+  catch (error) {
+    mensajeError.value = getApiErrorMessage(error, 'No se pudo guardar el vehiculo')
+  }
+  finally {
     guardando.value = false
   }
 }
- 
-function solicitarEliminacion(vehiculo) {
-  if (vehiculo.estado === 'arrendado') return
-  vehiculoAEliminar.value = vehiculo
-  mostrarConfirmacion.value = true
+
+function pedirCambioEstado(vehiculo: Vehiculo) {
+  limpiarMensajes()
+  elementoSeleccionado.value = vehiculo
+  nuevoEstado.value = vehiculo.estado === 'arrendado' ? 'disponible' : vehiculo.estado
+  estadoModalAbierto.value = true
 }
- 
-function cancelarEliminacion() {
-  mostrarConfirmacion.value = false
-  vehiculoAEliminar.value = null
+
+function cerrarEstadoModal() {
+  estadoModalAbierto.value = false
+  elementoSeleccionado.value = null
 }
- 
-async function confirmarEliminacion() {
-  if (!vehiculoAEliminar.value) return
-  eliminando.value = true
+
+async function cambiarEstado() {
+  if (!elementoSeleccionado.value) {
+    return
+  }
+
+  guardando.value = true
+  limpiarMensajes()
+
   try {
-    await $fetch(`/api/vehiculos/${vehiculoAEliminar.value.id}`, { method: 'DELETE' })
-    mostrarConfirmacion.value = false
-    vehiculoAEliminar.value = null
-    await refresh()
-  } catch (error) {
-    alert(error.data?.statusMessage || 'No se pudo eliminar el vehículo.')
-  } finally {
-    eliminando.value = false
+    await $fetch(`/api/vehiculos/${elementoSeleccionado.value.id}/estado`, {
+      method: 'PATCH',
+      body: {
+        estado: nuevoEstado.value,
+      },
+    })
+
+    mensajeExito.value = 'Estado del vehiculo actualizado'
+    cerrarEstadoModal()
+    await cargarVehiculos()
+  }
+  catch (error) {
+    mensajeError.value = getApiErrorMessage(error, 'No se pudo cambiar el estado del vehiculo')
+  }
+  finally {
+    guardando.value = false
   }
 }
+
+function pedirDarBaja(vehiculo: Vehiculo) {
+  limpiarMensajes()
+
+  if (!esAdministrador.value) {
+    mensajeError.value = 'Solo el administrador puede dar de baja vehiculos'
+    return
+  }
+
+  elementoSeleccionado.value = vehiculo
+  confirmacionAbierta.value = true
+}
+
+function cerrarConfirmacion() {
+  confirmacionAbierta.value = false
+  elementoSeleccionado.value = null
+}
+
+async function darBajaVehiculo() {
+  if (!elementoSeleccionado.value) {
+    return
+  }
+
+  guardando.value = true
+  limpiarMensajes()
+
+  try {
+    await $fetch(`/api/vehiculos/${elementoSeleccionado.value.id}`, {
+      method: 'DELETE',
+    })
+
+    mensajeExito.value = 'Vehiculo dado de baja correctamente'
+    cerrarConfirmacion()
+    await cargarVehiculos()
+  }
+  catch (error) {
+    mensajeError.value = getApiErrorMessage(error, 'No se pudo dar de baja el vehiculo')
+  }
+  finally {
+    guardando.value = false
+  }
+}
+
+function contarPorEstado(estado: EstadoVehiculo) {
+  return vehiculos.value.filter((vehiculo) => vehiculo.estado === estado).length
+}
+
+onMounted(() => {
+  cargarDatos()
+})
+// Lógica pendiente para después:
+//
+// 1. Importar el type Vehiculo.
+// 2. Obtener la sesión con useUserSession().
+// 3. Detectar si el usuario es administrador o ejecutivo.
+// 4. Cargar vehículos desde GET /api/vehiculos.
+// 5. Cargar tipos de vehículo para el formulario.
+// 6. Filtrar por texto y estado.
+// 7. Abrir modal para crear vehículo.
+// 8. Abrir modal para editar vehículo.
+// 9. Crear vehículo con POST /api/vehiculos.
+// 10. Editar vehículo con PUT /api/vehiculos/:id.
+// 11. Cambiar estado con PATCH /api/vehiculos/:id/estado.
+// 12. Dar de baja con DELETE /api/vehiculos/:id.
+//
+// Campos reales según schema.prisma:
+// tipo_id, patente, marca, modelo, anio, color, estado, foto_url, activo.
+//
+// Reglas importantes:
+// - Ejecutivo no puede cambiar patente, tipo_id, estado ni activo.
+// - Administrador no puede poner estado arrendado manualmente.
+// - Vehículo de_baja no se reactiva desde esta página.
 </script>

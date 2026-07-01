@@ -1,9 +1,3 @@
 <template>
-  <main class="auth-layout">
-    <slot />
-  </main>
+  <slot />
 </template>
-
-<script setup lang="ts">
-// Layout para pantallas de autenticacion.
-</script>

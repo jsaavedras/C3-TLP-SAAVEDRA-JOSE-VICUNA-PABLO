@@ -1,9 +1,9 @@
-export {}
+import type { UsuarioSesion } from './usuario'
 
-declare global {
-  interface AuthUser {
-    id: number
-    nombre: string
-    perfil: string
-  }
+
+// Extiende la interfaz User con las propiedades de UsuarioSesion
+declare module '#auth-utils' {
+  interface User extends UsuarioSesion {}
 }
+
+export {}
